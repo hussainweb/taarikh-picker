@@ -16,8 +16,7 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "default": "./dist/index.iife.js"
+      "import": "./dist/index.js"
     },
     "./style.css": "./dist/style.css"
   },
@@ -25,10 +24,27 @@
     "build": "vp pack",
     "typecheck": "tsc --noEmit",
     "check": "vp check",
-    "test": "vp test"
+    "test": "vp test",
+    "ci": "npm run check && npm run test && npm run build && publint && attw --pack && size-limit"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@size-limit/preset-small-lib": "^14.2.0",
+    "publint": "^0.3.25",
+    "size-limit": "^14.2.0",
     "typescript": "~5.8.2",
     "vite-plus": "^1.1.0"
-  }
+  },
+  "size-limit": [
+    {
+      "name": "ESM",
+      "path": "dist/index.js",
+      "limit": "5 KB"
+    },
+    {
+      "name": "IIFE",
+      "path": "dist/index.iife.js",
+      "limit": "6 KB"
+    }
+  ]
 }
