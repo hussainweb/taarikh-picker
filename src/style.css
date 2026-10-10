@@ -1,8 +1,262 @@
-:root {
-  --tp-font-family: inherit;
-  --tp-primary-color: #1a73e8;
-}
+@layer taarikh-picker {
+  :root {
+    --tp-font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --tp-font-size: 0.9375rem;
+    --tp-primary-color: #1a73e8;
+    --tp-accent: var(--tp-primary-color);
+    --tp-bg: light-dark(#ffffff, #1e1e1e);
+    --tp-text: light-dark(#202124, #e8eaed);
+    --tp-text-muted: light-dark(#5f6368, #9aa0a6);
+    --tp-border-color: light-dark(#dadce0, #3c4043);
+    --tp-border: 1px solid var(--tp-border-color);
+    --tp-radius: 8px;
+    --tp-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    --tp-btn-bg: light-dark(#f8f9fa, #2a2b2e);
+    --tp-btn-hover-bg: light-dark(#f1f3f4, #35363a);
+    --tp-btn-text: var(--tp-text);
+    --tp-focus-ring: 2px solid var(--tp-accent);
+    --tp-target-size: 32px;
+    --tp-anchor-offset: 4px;
+  }
 
-.taarikh-picker {
-  box-sizing: border-box;
+  /* Trigger button adjacent to the input */
+  :where(.tp-btn-trigger) {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: var(--tp-target-size);
+    min-block-size: var(--tp-target-size);
+    padding: 4px 8px;
+    margin-inline-start: 4px;
+    background: var(--tp-btn-bg);
+    color: var(--tp-btn-text);
+    border: var(--tp-border);
+    border-radius: var(--tp-radius);
+    cursor: pointer;
+    font-family: var(--tp-font-family);
+    font-size: var(--tp-font-size);
+    vertical-align: middle;
+    transition:
+      background-color 150ms ease,
+      border-color 150ms ease;
+  }
+
+  :where(.tp-btn-trigger:hover) {
+    background: var(--tp-btn-hover-bg);
+    border-color: light-dark(#bdc1c6, #5f6368);
+  }
+
+  :where(.tp-btn-trigger:focus-visible) {
+    outline: var(--tp-focus-ring);
+    outline-offset: 2px;
+  }
+
+  :where(.tp-icon-wrapper) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+  }
+
+  :where(.tp-icon-calendar) {
+    display: block;
+    inline-size: 18px;
+    block-size: 18px;
+  }
+
+  /* Calendar <dialog> shell */
+  :where(.tp-dialog) {
+    box-sizing: border-box;
+    padding: 14px;
+    background: var(--tp-bg);
+    color: var(--tp-text);
+    border: var(--tp-border);
+    border-radius: var(--tp-radius);
+    box-shadow: var(--tp-shadow);
+    font-family: var(--tp-font-family);
+    font-size: var(--tp-font-size);
+    inline-size: 300px;
+    max-inline-size: min(92vw, 360px);
+    overflow: visible;
+
+    /* CSS Anchor Positioning properties */
+    position-area: block-end span-inline-start;
+    position-try-fallbacks: flip-block, flip-inline;
+    position-try-options: flip-block, flip-inline;
+    inset-area: block-end span-inline-start;
+  }
+
+  /* Reset margin when anchor positioning is active */
+  @supports (position-anchor: --test) or (position-area: block-end span-inline-start) {
+    :where(.tp-dialog) {
+      margin: 0;
+      margin-block-start: var(--tp-anchor-offset);
+    }
+  }
+
+  /* Centered dialog fallback when anchor positioning is not supported */
+  @supports not ((position-anchor: --test) or (position-area: block-end span-inline-start)) {
+    :where(.tp-dialog) {
+      margin: auto;
+    }
+  }
+
+  /* Backdrop: transparent when anchored, subtle veil when centered */
+  :where(.tp-dialog::backdrop) {
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  @supports (position-anchor: --test) or (position-area: block-end span-inline-start) {
+    :where(.tp-dialog::backdrop) {
+      background: transparent;
+    }
+  }
+
+  /* Visually hidden utility for accessible headings */
+  :where(.tp-visually-hidden) {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Header */
+  :where(.tp-dialog-header) {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-block-end: 12px;
+  }
+
+  :where(.tp-header-nav) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+  }
+
+  :where(.tp-header-selectors) {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    justify-content: center;
+  }
+
+  :where(.tp-btn-prev),
+  :where(.tp-btn-next) {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: var(--tp-target-size);
+    min-block-size: var(--tp-target-size);
+    padding: 4px 8px;
+    background: var(--tp-btn-bg);
+    color: var(--tp-btn-text);
+    border: var(--tp-border);
+    border-radius: var(--tp-radius);
+    cursor: pointer;
+    font-size: 1.125rem;
+    line-height: 1;
+    transition: background-color 150ms ease;
+  }
+
+  :where(.tp-btn-prev:hover:not(:disabled)),
+  :where(.tp-btn-next:hover:not(:disabled)) {
+    background: var(--tp-btn-hover-bg);
+  }
+
+  :where(.tp-btn-prev:disabled),
+  :where(.tp-btn-next:disabled) {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  :where(.tp-btn-prev:focus-visible),
+  :where(.tp-btn-next:focus-visible),
+  :where(.tp-select-month:focus-visible),
+  :where(.tp-select-year:focus-visible),
+  :where(.tp-btn-today:focus-visible),
+  :where(.tp-btn-clear:focus-visible) {
+    outline: var(--tp-focus-ring);
+    outline-offset: 2px;
+  }
+
+  :where(.tp-select-month),
+  :where(.tp-select-year) {
+    box-sizing: border-box;
+    padding: 4px 8px;
+    background: var(--tp-bg);
+    color: var(--tp-text);
+    border: var(--tp-border);
+    border-radius: var(--tp-radius);
+    font-family: var(--tp-font-family);
+    font-size: var(--tp-font-size);
+    min-block-size: var(--tp-target-size);
+    cursor: pointer;
+  }
+
+  :where(.tp-live-region) {
+    font-size: 0.8125rem;
+    text-align: center;
+    color: var(--tp-text-muted);
+    min-block-size: 1.25em;
+  }
+
+  /* Grid container placeholder */
+  :where(.tp-grid-container) {
+    box-sizing: border-box;
+    min-block-size: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-block-end: 12px;
+    border: 1px dashed var(--tp-border-color);
+    border-radius: var(--tp-radius);
+    color: var(--tp-text-muted);
+    font-size: 0.875rem;
+    padding: 8px;
+  }
+
+  /* Footer */
+  :where(.tp-dialog-footer) {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding-block-start: 10px;
+    border-block-start: var(--tp-border);
+  }
+
+  :where(.tp-btn-today),
+  :where(.tp-btn-clear) {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: var(--tp-target-size);
+    min-block-size: var(--tp-target-size);
+    padding: 5px 12px;
+    background: var(--tp-btn-bg);
+    color: var(--tp-btn-text);
+    border: var(--tp-border);
+    border-radius: var(--tp-radius);
+    cursor: pointer;
+    font-family: var(--tp-font-family);
+    font-size: var(--tp-font-size);
+    transition: background-color 150ms ease;
+  }
+
+  :where(.tp-btn-today:hover),
+  :where(.tp-btn-clear:hover) {
+    background: var(--tp-btn-hover-bg);
+  }
 }
