@@ -1,0 +1,8 @@
+:root {
+  --tp-font-family: inherit;
+  --tp-primary-color: #1a73e8;
+}
+
+.taarikh-picker {
+  box-sizing: border-box;
+}
