@@ -1,4 +1,4 @@
-import type { CalendarEngine, PlainDate } from './types.js';
+import type { CalendarEngine, PlainDate } from "./types.js";
 
 /**
  * Return civil day of the week from Julian Day Number (JDN).
@@ -9,7 +9,7 @@ import type { CalendarEngine, PlainDate } from './types.js';
  */
 export function weekdayFromJdn(jdn: number): number {
   const floored = Math.floor(jdn);
-  return ((floored + 1) % 7 + 7) % 7;
+  return (((floored + 1) % 7) + 7) % 7;
 }
 
 /**
@@ -19,11 +19,11 @@ export function weekdayFromJdn(jdn: number): number {
 export function weekday(jdn: number): number;
 export function weekday(date: PlainDate, engine: CalendarEngine): number;
 export function weekday(dateOrJdn: PlainDate | number, engine?: CalendarEngine): number {
-  if (typeof dateOrJdn === 'number') {
+  if (typeof dateOrJdn === "number") {
     return weekdayFromJdn(dateOrJdn);
   }
   if (!engine) {
-    throw new TypeError('CalendarEngine is required when passing a PlainDate to weekday()');
+    throw new TypeError("CalendarEngine is required when passing a PlainDate to weekday()");
   }
   return weekdayFromJdn(engine.toJulianDay(dateOrJdn));
 }
@@ -76,7 +76,7 @@ export function addMonths(date: PlainDate, months: number, engine: CalendarEngin
         month += remaining;
         remaining = 0;
       } else {
-        remaining -= (monthsLeftInYear + 1);
+        remaining -= monthsLeftInYear + 1;
         year += 1;
         month = 1;
       }
@@ -89,7 +89,7 @@ export function addMonths(date: PlainDate, months: number, engine: CalendarEngin
         month -= negRemaining;
         negRemaining = 0;
       } else {
-        negRemaining -= (monthsBeforeInYear + 1);
+        negRemaining -= monthsBeforeInYear + 1;
         year -= 1;
         month = engine.monthsInYear(year);
       }

@@ -1,4 +1,4 @@
-export type { CalendarEngine, PlainDate } from './types.js';
+export type { CalendarEngine, PlainDate } from "./types.js";
 export {
   addDays,
   addMonths,
@@ -11,4 +11,4 @@ export {
   today,
   weekday,
   weekdayFromJdn,
-} from './helpers.js';
+} from "./helpers.js";

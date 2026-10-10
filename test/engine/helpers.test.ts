@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import type { CalendarEngine, PlainDate } from '../../src/engine/types.js';
+import { describe, expect, it } from "vitest";
+import type { CalendarEngine, PlainDate } from "../../src/engine/types.js";
 import {
   addDays,
   addMonths,
@@ -12,7 +12,7 @@ import {
   today,
   weekday,
   weekdayFromJdn,
-} from '../../src/engine/helpers.js';
+} from "../../src/engine/helpers.js";
 
 /**
  * Minimal mock engine based on standard 12-month calendar
@@ -27,7 +27,7 @@ function createMockHijriEngine(): CalendarEngine {
   };
 
   return {
-    id: 'mock-hijri',
+    id: "mock-hijri",
     monthsInYear(_year: number): number {
       return 12;
     },
@@ -40,11 +40,7 @@ function createMockHijriEngine(): CalendarEngine {
     toJulianDay(date: PlainDate): number {
       const { year, month, day } = date;
       return (
-        day +
-        Math.ceil(29.5 * (month - 1)) +
-        354 * year +
-        Math.floor((11 * year) / 30) +
-        1948084
+        day + Math.ceil(29.5 * (month - 1)) + 354 * year + Math.floor((11 * year) / 30) + 1948084
       );
     },
     fromJulianDay(julianDay: number): PlainDate {
@@ -72,7 +68,7 @@ function createMockHijriEngine(): CalendarEngine {
  */
 function createVariableMonthEngine(): CalendarEngine {
   return {
-    id: 'mock-variable-months',
+    id: "mock-variable-months",
     monthsInYear(year: number): number {
       return year === 2 ? 13 : 12;
     },
@@ -92,13 +88,13 @@ function createVariableMonthEngine(): CalendarEngine {
   };
 }
 
-describe('weekdayFromJdn and weekday', () => {
-  it('maps JDN 0 to Monday (1)', () => {
+describe("weekdayFromJdn and weekday", () => {
+  it("maps JDN 0 to Monday (1)", () => {
     expect(weekdayFromJdn(0)).toBe(1);
     expect(weekday(0)).toBe(1);
   });
 
-  it('correctly maps the full 7-day civil week sequence (Sunday=0 to Saturday=6)', () => {
+  it("correctly maps the full 7-day civil week sequence (Sunday=0 to Saturday=6)", () => {
     expect(weekdayFromJdn(6)).toBe(0); // Sunday
     expect(weekdayFromJdn(0)).toBe(1); // Monday
     expect(weekdayFromJdn(1)).toBe(2); // Tuesday
@@ -109,26 +105,26 @@ describe('weekdayFromJdn and weekday', () => {
     expect(weekdayFromJdn(7)).toBe(1); // Monday
   });
 
-  it('correctly calculates known reference civil dates', () => {
+  it("correctly calculates known reference civil dates", () => {
     // 2026-10-10 is a Saturday (JDN 2461324)
     expect(weekdayFromJdn(2461324)).toBe(6);
     // 2026-10-11 is a Sunday (JDN 2461325)
     expect(weekdayFromJdn(2461325)).toBe(0);
   });
 
-  it('handles negative JDNs without returning negative results', () => {
+  it("handles negative JDNs without returning negative results", () => {
     expect(weekdayFromJdn(-1)).toBe(0); // Sunday
     expect(weekdayFromJdn(-2)).toBe(6); // Saturday
     expect(weekdayFromJdn(-7)).toBe(1); // Monday
     expect(weekdayFromJdn(-8)).toBe(0); // Sunday
   });
 
-  it('floors fractional JDN inputs', () => {
+  it("floors fractional JDN inputs", () => {
     expect(weekdayFromJdn(2461324.5)).toBe(6);
     expect(weekday(2461324.9)).toBe(6);
   });
 
-  it('delegates to engine.toJulianDay when passed a PlainDate', () => {
+  it("delegates to engine.toJulianDay when passed a PlainDate", () => {
     const engine = createMockHijriEngine();
     // 1445-12-01 in mock engine
     const date: PlainDate = { year: 1445, month: 12, day: 1 };
@@ -136,15 +132,15 @@ describe('weekdayFromJdn and weekday', () => {
     expect(weekday(date, engine)).toBe(weekdayFromJdn(expectedJdn));
   });
 
-  it('throws TypeError if engine is omitted when passing a PlainDate', () => {
+  it("throws TypeError if engine is omitted when passing a PlainDate", () => {
     const date: PlainDate = { year: 1445, month: 12, day: 1 };
     // @ts-expect-error Testing invalid runtime call
     expect(() => weekday(date)).toThrow(TypeError);
   });
 });
 
-describe('gregorianToJulianDay', () => {
-  it('converts known reference civil dates matching PHP gregoriantojd', () => {
+describe("gregorianToJulianDay", () => {
+  it("converts known reference civil dates matching PHP gregoriantojd", () => {
     expect(gregorianToJulianDay(1970, 1, 1)).toBe(2440588);
     expect(gregorianToJulianDay(2000, 1, 1)).toBe(2451545);
     expect(gregorianToJulianDay(2026, 10, 10)).toBe(2461324);
@@ -155,23 +151,23 @@ describe('gregorianToJulianDay', () => {
   });
 });
 
-describe('addDays', () => {
+describe("addDays", () => {
   const engine = createMockHijriEngine();
 
-  it('adds positive days', () => {
+  it("adds positive days", () => {
     const start: PlainDate = { year: 1445, month: 1, day: 10 };
     const result = addDays(start, 5, engine);
     expect(result).toEqual({ year: 1445, month: 1, day: 15 });
   });
 
-  it('adds days across month boundaries', () => {
+  it("adds days across month boundaries", () => {
     const start: PlainDate = { year: 1445, month: 1, day: 28 };
     // Month 1 has 30 days
     const result = addDays(start, 5, engine);
     expect(result).toEqual({ year: 1445, month: 2, day: 3 });
   });
 
-  it('subtracts days across month and year boundaries', () => {
+  it("subtracts days across month and year boundaries", () => {
     const start: PlainDate = { year: 1445, month: 1, day: 2 };
     const result = addDays(start, -5, engine);
     // Year 1444 month 12 has 29 or 30 days
@@ -179,54 +175,54 @@ describe('addDays', () => {
     expect(result.month).toBe(12);
   });
 
-  it('adding 0 days returns equivalent date', () => {
+  it("adding 0 days returns equivalent date", () => {
     const start: PlainDate = { year: 1445, month: 5, day: 15 };
     expect(addDays(start, 0, engine)).toEqual(start);
   });
 
-  it('truncates non-integer day increments', () => {
+  it("truncates non-integer day increments", () => {
     const start: PlainDate = { year: 1445, month: 1, day: 10 };
     expect(addDays(start, 3.8, engine)).toEqual({ year: 1445, month: 1, day: 13 });
   });
 });
 
-describe('addMonths', () => {
+describe("addMonths", () => {
   const engine = createMockHijriEngine();
 
-  it('adds months within the same year', () => {
+  it("adds months within the same year", () => {
     const start: PlainDate = { year: 1445, month: 2, day: 10 };
     expect(addMonths(start, 3, engine)).toEqual({ year: 1445, month: 5, day: 10 });
   });
 
-  it('adds months crossing year boundaries', () => {
+  it("adds months crossing year boundaries", () => {
     const start: PlainDate = { year: 1445, month: 10, day: 15 };
     expect(addMonths(start, 4, engine)).toEqual({ year: 1446, month: 2, day: 15 });
     expect(addMonths(start, 14, engine)).toEqual({ year: 1446, month: 12, day: 15 });
   });
 
-  it('subtracts months within the same year', () => {
+  it("subtracts months within the same year", () => {
     const start: PlainDate = { year: 1445, month: 5, day: 10 };
     expect(addMonths(start, -3, engine)).toEqual({ year: 1445, month: 2, day: 10 });
   });
 
-  it('subtracts months crossing year boundaries', () => {
+  it("subtracts months crossing year boundaries", () => {
     const start: PlainDate = { year: 1445, month: 2, day: 15 };
     expect(addMonths(start, -3, engine)).toEqual({ year: 1444, month: 11, day: 15 });
   });
 
-  it('adding 0 months returns the same date', () => {
+  it("adding 0 months returns the same date", () => {
     const start: PlainDate = { year: 1445, month: 6, day: 20 };
     expect(addMonths(start, 0, engine)).toEqual(start);
   });
 
-  it('clamps day when target month has fewer days', () => {
+  it("clamps day when target month has fewer days", () => {
     // Month 1 has 30 days; month 2 has 29 days
     const start: PlainDate = { year: 1445, month: 1, day: 30 };
     const nextMonth = addMonths(start, 1, engine);
     expect(nextMonth).toEqual({ year: 1445, month: 2, day: 29 });
   });
 
-  it('handles variable-month calendar engines (e.g. leap month 13)', () => {
+  it("handles variable-month calendar engines (e.g. leap month 13)", () => {
     const varEngine = createVariableMonthEngine();
     // Year 1 has 12 months, year 2 has 13 months
     const start: PlainDate = { year: 1, month: 11, day: 15 };
@@ -241,31 +237,31 @@ describe('addMonths', () => {
   });
 });
 
-describe('addYears', () => {
+describe("addYears", () => {
   const engine = createMockHijriEngine();
 
-  it('adds positive years', () => {
+  it("adds positive years", () => {
     const start: PlainDate = { year: 1445, month: 5, day: 15 };
     expect(addYears(start, 2, engine)).toEqual({ year: 1447, month: 5, day: 15 });
   });
 
-  it('subtracts years', () => {
+  it("subtracts years", () => {
     const start: PlainDate = { year: 1445, month: 5, day: 15 };
     expect(addYears(start, -3, engine)).toEqual({ year: 1442, month: 5, day: 15 });
   });
 
-  it('adding 0 years returns same date', () => {
+  it("adding 0 years returns same date", () => {
     const start: PlainDate = { year: 1445, month: 5, day: 15 };
     expect(addYears(start, 0, engine)).toEqual(start);
   });
 
-  it('clamps day if target year has fewer days in the same month (e.g. leap to non-leap)', () => {
+  it("clamps day if target year has fewer days in the same month (e.g. leap to non-leap)", () => {
     // In mock hijri: year 2 is leap (month 12 has 30 days), year 3 is not leap (month 12 has 29 days)
     const leapDate: PlainDate = { year: 2, month: 12, day: 30 };
     expect(addYears(leapDate, 1, engine)).toEqual({ year: 3, month: 12, day: 29 });
   });
 
-  it('clamps month if target year has fewer months', () => {
+  it("clamps month if target year has fewer months", () => {
     const varEngine = createVariableMonthEngine();
     // Year 2 has 13 months; year 3 has 12 months
     const leapMonthDate: PlainDate = { year: 2, month: 13, day: 15 };
@@ -273,49 +269,49 @@ describe('addYears', () => {
   });
 });
 
-describe('compareDates, isSameDay, isBefore, isAfter', () => {
+describe("compareDates, isSameDay, isBefore, isAfter", () => {
   const d1: PlainDate = { year: 1445, month: 5, day: 10 };
   const d2: PlainDate = { year: 1445, month: 5, day: 10 };
   const d3: PlainDate = { year: 1445, month: 5, day: 11 };
   const d4: PlainDate = { year: 1445, month: 6, day: 1 };
   const d5: PlainDate = { year: 1446, month: 1, day: 1 };
 
-  it('compareDates returns 0 for equal dates', () => {
+  it("compareDates returns 0 for equal dates", () => {
     expect(compareDates(d1, d2)).toBe(0);
   });
 
-  it('compareDates returns -1 when first is earlier', () => {
+  it("compareDates returns -1 when first is earlier", () => {
     expect(compareDates(d1, d3)).toBe(-1); // different day
     expect(compareDates(d1, d4)).toBe(-1); // different month
     expect(compareDates(d1, d5)).toBe(-1); // different year
   });
 
-  it('compareDates returns 1 when first is later', () => {
+  it("compareDates returns 1 when first is later", () => {
     expect(compareDates(d3, d1)).toBe(1); // different day
     expect(compareDates(d4, d1)).toBe(1); // different month
     expect(compareDates(d5, d1)).toBe(1); // different year
   });
 
-  it('isSameDay correctly identifies same day', () => {
+  it("isSameDay correctly identifies same day", () => {
     expect(isSameDay(d1, d2)).toBe(true);
     expect(isSameDay(d1, d3)).toBe(false);
   });
 
-  it('isBefore correctly identifies earlier dates', () => {
+  it("isBefore correctly identifies earlier dates", () => {
     expect(isBefore(d1, d3)).toBe(true);
     expect(isBefore(d3, d1)).toBe(false);
     expect(isBefore(d1, d2)).toBe(false);
   });
 
-  it('isAfter correctly identifies later dates', () => {
+  it("isAfter correctly identifies later dates", () => {
     expect(isAfter(d3, d1)).toBe(true);
     expect(isAfter(d1, d3)).toBe(false);
     expect(isAfter(d1, d2)).toBe(false);
   });
 });
 
-describe('today', () => {
-  it('converts given Date to JDN and then converts via engine.fromJulianDay', () => {
+describe("today", () => {
+  it("converts given Date to JDN and then converts via engine.fromJulianDay", () => {
     const engine = createMockHijriEngine();
     // 2026-10-10 Gregorian civil date
     const date = new Date(2026, 9, 10); // month is 0-indexed in JS Date
@@ -324,12 +320,12 @@ describe('today', () => {
     expect(result).toEqual(engine.fromJulianDay(expectedJdn));
   });
 
-  it('calling today(engine) without date returns a valid PlainDate', () => {
+  it("calling today(engine) without date returns a valid PlainDate", () => {
     const engine = createMockHijriEngine();
     const result = today(engine);
-    expect(typeof result.year).toBe('number');
-    expect(typeof result.month).toBe('number');
-    expect(typeof result.day).toBe('number');
+    expect(typeof result.year).toBe("number");
+    expect(typeof result.month).toBe("number");
+    expect(typeof result.day).toBe("number");
     expect(result.month).toBeGreaterThanOrEqual(1);
     expect(result.month).toBeLessThanOrEqual(12);
     expect(result.day).toBeGreaterThanOrEqual(1);
