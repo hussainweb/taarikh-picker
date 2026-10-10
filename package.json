@@ -21,6 +21,7 @@
     "./style.css": "./dist/style.css"
   },
   "scripts": {
+    "dev": "vp dev",
     "build": "vp pack",
     "typecheck": "tsc --noEmit",
     "check": "vp check",
