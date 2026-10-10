@@ -2,6 +2,21 @@ import "./style.css";
 
 export const VERSION: string = "0.1.0";
 
+export type { CalendarEngine, PlainDate } from "./engine/index.js";
+export {
+  addDays,
+  addMonths,
+  addYears,
+  compareDates,
+  gregorianToJulianDay,
+  isAfter,
+  isBefore,
+  isSameDay,
+  today,
+  weekday,
+  weekdayFromJdn,
+} from "./engine/index.js";
+
 export interface TaarikhPickerOptions {
   readonly locale?: string | undefined;
 }
