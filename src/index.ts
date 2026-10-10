@@ -2,12 +2,19 @@ import "./style.css";
 
 export const VERSION: string = "0.1.0";
 
-export type { CalendarEngine, PlainDate } from "./engine/index.js";
+export type { CalendarEngine, MonthLabels, PlainDate } from "./engine/index.js";
 export {
+  DEFAULT_MONTH_LABELS,
+  FATIMID_MONTH_NAMES,
+  FATIMID_MONTH_NAMES_SHORT,
+  FatimidAstronomicalCalendar,
   addDays,
   addMonths,
   addYears,
   compareDates,
+  fatimidAstronomical,
+  fatimidAstronomicalCalendar,
+  getMonthName,
   gregorianToJulianDay,
   isAfter,
   isBefore,
