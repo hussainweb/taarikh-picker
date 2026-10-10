@@ -24,6 +24,16 @@ export {
   weekdayFromJdn,
 } from "./engine/index.js";
 
+export type { DisplayOptions } from "./format/index.js";
+export {
+  formatDayAriaLabel,
+  formatDisplay,
+  formatMonthHeading,
+  formatValue,
+  getWeekdayNames,
+  parseValue,
+} from "./format/index.js";
+
 export interface TaarikhPickerOptions {
   readonly locale?: string | undefined;
 }
