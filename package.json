@@ -1,0 +1,34 @@
+{
+  "name": "@taarikh/picker",
+  "version": "0.1.0",
+  "description": "Lightweight, accessible Hijri calendar date picker",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.iife.js"
+    },
+    "./style.css": "./dist/style.css"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "typecheck": "tsc --noEmit",
+    "check": "vp check",
+    "test": "vp test"
+  },
+  "devDependencies": {
+    "typescript": "~5.8.2",
+    "vite-plus": "^1.1.0"
+  }
+}
