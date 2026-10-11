@@ -1,7 +1,7 @@
 import type { CalendarEngine, PlainDate } from "../engine/types.js";
+import { fatimidAstronomicalCalendar } from "../engine/fatimid.js";
 import { addMonths, today } from "../engine/helpers.js";
 import { getMonthName } from "../engine/labels.js";
-import { createDefaultCalendarEngine } from "./default-engine.js";
 import { CALENDAR_SVG_ICON, DEFAULT_LABELS, nextUniqueId } from "./dom.js";
 import type { DialogElements, DialogShellOptions, ResolvedPickerLabels } from "./types.js";
 
@@ -31,7 +31,7 @@ export class DialogShell {
   public constructor(input: HTMLInputElement, options?: DialogShellOptions) {
     this.input = input;
     this.options = options ?? {};
-    this.engine = this.options.calendarEngine ?? createDefaultCalendarEngine();
+    this.engine = this.options.calendarEngine ?? fatimidAstronomicalCalendar;
 
     this.labels = {
       chooseDate: this.options.labels?.chooseDate ?? DEFAULT_LABELS.chooseDate,

@@ -311,6 +311,17 @@ describe("DialogShell - WAI-ARIA APG Date Picker Dialog", () => {
     expect(elements.liveRegion.textContent).toBe("M3-Long 1448");
     expect(elements.selectMonth.children[2]?.textContent).toBe("M3-Long");
   });
+
+  it("uses fatimidAstronomicalCalendar as the default calendar engine", () => {
+    const shell = new DialogShell(input as unknown as HTMLInputElement, {
+      initialDate: { year: 1445, month: 12, day: 29 },
+    });
+    const elements = shell.getElements();
+
+    expect(elements.liveRegion.textContent).toBe("Zilhajj al-Haraam 1445");
+    expect(fatimidAstronomicalCalendar.isKabisa(1445)).toBe(true);
+    expect(fatimidAstronomicalCalendar.daysInMonth(1445, 12)).toBe(30);
+  });
 });
 
 describe("TaarikhPicker & createPicker API", () => {
