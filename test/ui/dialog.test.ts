@@ -1,7 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DialogShell } from "../../src/ui/dialog.js";
 import { createPicker, TaarikhPicker } from "../../src/index.js";
-import type { PlainDate } from "../../src/engine/types.js";
+import type { MonthLabels, PlainDate } from "../../src/engine/index.js";
+import { fatimidAstronomicalCalendar } from "../../src/engine/index.js";
+import { formatDayAriaLabel, formatMonthHeading } from "../../src/format/index.js";
 import { resetUniqueIdCounter } from "../../src/ui/dom.js";
 import {
   type MockDocument,
@@ -77,7 +79,7 @@ describe("DialogShell - WAI-ARIA APG Date Picker Dialog", () => {
     // Polite live region
     expect(elements.liveRegion.className).toBe("tp-live-region");
     expect(elements.liveRegion.getAttribute("aria-live")).toBe("polite");
-    expect(elements.liveRegion.textContent).toBe("Muharram 1448");
+    expect(elements.liveRegion.textContent).toBe("Moharram al-Haraam 1448");
 
     // Grid container placeholder
     expect(elements.gridContainer.className).toBe("tp-grid-container");
@@ -154,14 +156,14 @@ describe("DialogShell - WAI-ARIA APG Date Picker Dialog", () => {
     });
     const elements = shell.getElements();
 
-    expect(elements.liveRegion.textContent).toBe("Muharram 1448");
+    expect(elements.liveRegion.textContent).toBe("Moharram al-Haraam 1448");
 
     // Click Next month
     elements.btnNext.dispatchEvent(new Event("click"));
     expect(shell.getVisibleDate().month).toBe(2);
     expect(shell.getVisibleDate().year).toBe(1448);
     expect(elements.selectMonth.value).toBe("2");
-    expect(elements.liveRegion.textContent).toBe("Safar 1448");
+    expect(elements.liveRegion.textContent).toBe("Safar al-Muzaffar 1448");
     expect(onMonthChange).toHaveBeenCalledWith(expect.objectContaining({ month: 2, year: 1448 }));
 
     // Click Prev month
@@ -169,7 +171,7 @@ describe("DialogShell - WAI-ARIA APG Date Picker Dialog", () => {
     expect(shell.getVisibleDate().month).toBe(1);
     expect(shell.getVisibleDate().year).toBe(1448);
     expect(elements.selectMonth.value).toBe("1");
-    expect(elements.liveRegion.textContent).toBe("Muharram 1448");
+    expect(elements.liveRegion.textContent).toBe("Moharram al-Haraam 1448");
   });
 
   it("updates visible date when month or year selects change", () => {
@@ -178,17 +180,17 @@ describe("DialogShell - WAI-ARIA APG Date Picker Dialog", () => {
     });
     const elements = shell.getElements();
 
-    // Change month select to month 9 (Ramadan)
+    // Change month select to month 9 (Ramadan al-Moazzam)
     elements.selectMonth.value = "9";
     elements.selectMonth.dispatchEvent(new Event("change"));
     expect(shell.getVisibleDate().month).toBe(9);
-    expect(elements.liveRegion.textContent).toBe("Ramadan 1448");
+    expect(elements.liveRegion.textContent).toBe("Ramadan al-Moazzam 1448");
 
     // Change year select to 1450
     elements.selectYear.value = "1450";
     elements.selectYear.dispatchEvent(new Event("change"));
     expect(shell.getVisibleDate().year).toBe(1450);
-    expect(elements.liveRegion.textContent).toBe("Ramadan 1450");
+    expect(elements.liveRegion.textContent).toBe("Ramadan al-Moazzam 1450");
   });
 
   it("bounds navigation buttons when minDate and maxDate are specified", () => {
@@ -263,6 +265,51 @@ describe("DialogShell - WAI-ARIA APG Date Picker Dialog", () => {
 
     // Repeating destroy is a safe no-op
     expect(() => shell.destroy()).not.toThrow();
+  });
+
+  it("ensures dialog month name matches formatMonthHeading and formatDayAriaLabel", () => {
+    const testDate: PlainDate = { year: 1445, month: 9, day: 1 };
+    const shell = new DialogShell(input as unknown as HTMLInputElement, {
+      initialDate: testDate,
+    });
+    const elements = shell.getElements();
+
+    const heading = formatMonthHeading(testDate, fatimidAstronomicalCalendar);
+    expect(elements.liveRegion.textContent).toBe(heading);
+
+    const dayAria = formatDayAriaLabel(testDate, fatimidAstronomicalCalendar);
+    expect(dayAria).toContain("Ramadan al-Moazzam");
+    expect(elements.liveRegion.textContent).toContain("Ramadan al-Moazzam");
+    expect(elements.selectMonth.children[8]?.textContent).toBe("Ramadan al-Moazzam");
+  });
+
+  it("supports custom MonthLabels in DialogShell", () => {
+    const customLabels: MonthLabels = {
+      long: [
+        "M1-Long",
+        "M2-Long",
+        "M3-Long",
+        "M4-Long",
+        "M5-Long",
+        "M6-Long",
+        "M7-Long",
+        "M8-Long",
+        "M9-Long",
+        "M10-Long",
+        "M11-Long",
+        "M12-Long",
+      ],
+      short: ["M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8", "M9", "M10", "M11", "M12"],
+    };
+
+    const shell = new DialogShell(input as unknown as HTMLInputElement, {
+      initialDate: { year: 1448, month: 3, day: 1 },
+      labels: { months: customLabels },
+    });
+    const elements = shell.getElements();
+
+    expect(elements.liveRegion.textContent).toBe("M3-Long 1448");
+    expect(elements.selectMonth.children[2]?.textContent).toBe("M3-Long");
   });
 });
 

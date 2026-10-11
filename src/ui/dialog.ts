@@ -1,5 +1,6 @@
 import type { CalendarEngine, PlainDate } from "../engine/types.js";
 import { addMonths, today } from "../engine/helpers.js";
+import { getMonthName } from "../engine/labels.js";
 import { createDefaultCalendarEngine } from "./default-engine.js";
 import { CALENDAR_SVG_ICON, DEFAULT_LABELS, nextUniqueId } from "./dom.js";
 import type { DialogElements, DialogShellOptions, ResolvedPickerLabels } from "./types.js";
@@ -454,8 +455,7 @@ export class DialogShell {
   }
 
   private getMonthName(monthNumber: number): string {
-    const months = this.labels.months;
-    const name = months[monthNumber - 1];
-    return name ?? `Month ${monthNumber}`;
+    const name = getMonthName(monthNumber, "long", this.labels.months);
+    return name || `Month ${monthNumber}`;
   }
 }

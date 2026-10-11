@@ -1,3 +1,4 @@
+import { DEFAULT_MONTH_LABELS } from "../engine/labels.js";
 import type { ResolvedPickerLabels } from "./types.js";
 
 let idCounter: number = 0;
@@ -18,24 +19,6 @@ export function resetUniqueIdCounter(): void {
 }
 
 /**
- * Default English/transliterated Hijri month names.
- */
-export const DEFAULT_MONTH_NAMES: readonly string[] = [
-  "Muharram",
-  "Safar",
-  "Rabi' al-Awwal",
-  "Rabi' al-Thani",
-  "Jumada al-Ula",
-  "Jumada al-Ukhra",
-  "Rajab",
-  "Sha'ban",
-  "Ramadan",
-  "Shawwal",
-  "Dhu al-Qi'dah",
-  "Dhu al-Hijjah",
-];
-
-/**
  * Default resolved labels for the datepicker UI.
  */
 export const DEFAULT_LABELS: ResolvedPickerLabels = {
@@ -47,7 +30,7 @@ export const DEFAULT_LABELS: ResolvedPickerLabels = {
   today: "Today",
   clear: "Clear",
   dialogTitle: "Choose date",
-  months: DEFAULT_MONTH_NAMES,
+  months: DEFAULT_MONTH_LABELS,
 };
 
 /**

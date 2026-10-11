@@ -40,7 +40,7 @@ export {
 
 export type { DialogElements, DialogShellOptions, PickerLabels } from "./ui/types.js";
 export { DialogShell } from "./ui/dialog.js";
-export { DEFAULT_LABELS, DEFAULT_MONTH_NAMES } from "./ui/dom.js";
+export { DEFAULT_LABELS } from "./ui/dom.js";
 export { createDefaultCalendarEngine } from "./ui/default-engine.js";
 
 /**

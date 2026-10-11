@@ -1,4 +1,5 @@
 import type { CalendarEngine, PlainDate } from "../engine/types.js";
+import type { MonthLabels } from "../engine/labels.js";
 
 /**
  * Localisable labels for the datepicker dialog shell and controls.
@@ -12,7 +13,7 @@ export interface PickerLabels {
   readonly today?: string | undefined;
   readonly clear?: string | undefined;
   readonly dialogTitle?: string | undefined;
-  readonly months?: readonly string[] | undefined;
+  readonly months?: MonthLabels | undefined;
 }
 
 /**
@@ -27,7 +28,7 @@ export interface ResolvedPickerLabels {
   readonly today: string;
   readonly clear: string;
   readonly dialogTitle: string;
-  readonly months: readonly string[];
+  readonly months: MonthLabels;
 }
 
 /**
