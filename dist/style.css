@@ -1,0 +1,442 @@
+@layer taarikh-picker {
+  :root {
+    --tp-font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --tp-font-size: .9375rem;
+    --tp-accent: #1a73e8;
+    --tp-bg: light-dark(#fff, #1e1e1e);
+    --tp-text: light-dark(#202124, #e8eaed);
+    --tp-text-muted: light-dark(#5f6368, #9aa0a6);
+    --tp-border-color: light-dark(#dadce0, #3c4043);
+    --tp-border: 1px solid var(--tp-border-color);
+    --tp-radius: 8px;
+    --tp-shadow: 0 4px 20px #00000026;
+    --tp-btn-bg: light-dark(#f8f9fa, #2a2b2e);
+    --tp-btn-hover-bg: light-dark(#f1f3f4, #35363a);
+    --tp-btn-text: var(--tp-text);
+    --tp-focus-ring: 2px solid var(--tp-accent);
+    --tp-cell-size: 32px;
+    --tp-target-size: var(--tp-cell-size);
+    --tp-anchor-offset: 4px;
+    --tp-dialog-width: min(92vw, 350px);
+  }
+
+  :where(.tp-btn-trigger) {
+    box-sizing: border-box;
+    color-scheme: light dark;
+    min-inline-size: var(--tp-target-size);
+    min-block-size: var(--tp-target-size);
+    background: var(--tp-btn-bg);
+    color: var(--tp-btn-text);
+    border: var(--tp-border);
+    border-radius: var(--tp-radius);
+    cursor: pointer;
+    font-family: var(--tp-font-family);
+    font-size: var(--tp-font-size);
+    vertical-align: middle;
+    justify-content: center;
+    align-items: center;
+    margin-inline-start: 4px;
+    padding: 4px 8px;
+    transition: background-color .15s, border-color .15s;
+    display: inline-flex;
+  }
+
+  :where(.tp-btn-trigger:hover) {
+    background: var(--tp-btn-hover-bg);
+    border-color: light-dark(#bdc1c6, #5f6368);
+  }
+
+  :where(.tp-btn-trigger:focus-visible) {
+    outline: var(--tp-focus-ring);
+    outline-offset: 2px;
+  }
+
+  :where(.tp-icon-wrapper) {
+    justify-content: center;
+    align-items: center;
+    line-height: 0;
+    display: inline-flex;
+  }
+
+  :where(.tp-icon-calendar) {
+    block-size: 18px;
+    inline-size: 18px;
+    display: block;
+  }
+
+  :where(.tp-dialog) {
+    box-sizing: border-box;
+    color-scheme: light dark;
+    background: var(--tp-bg);
+    color: var(--tp-text);
+    border: var(--tp-border);
+    border-radius: var(--tp-radius);
+    box-shadow: var(--tp-shadow);
+    font-family: var(--tp-font-family);
+    font-size: var(--tp-font-size);
+    inline-size: var(--tp-dialog-width);
+    position-area: block-end span-inline-start;
+    position-try-fallbacks: flip-block, flip-inline;
+    opacity: 0;
+    max-inline-size: min(92vw, 360px);
+    transition: opacity .15s ease,
+      transform .15s ease,
+      overlay .15s ease allow-discrete,
+      display .15s ease allow-discrete;
+    padding: 14px;
+    overflow: visible;
+    transform: scale(.96);
+  }
+
+  :where(.tp-dialog[open]) {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  @starting-style {
+    :where(.tp-dialog[open]) {
+      opacity: 0;
+      transform: scale(.96);
+    }
+  }
+
+  @supports (position-anchor: --test) or (position-area: block-end span-inline-start) {
+    :where(.tp-dialog) {
+      margin: 0;
+      margin-block-start: var(--tp-anchor-offset);
+    }
+  }
+
+  @supports not ((position-anchor: --test) or (position-area: block-end span-inline-start)) {
+    :where(.tp-dialog) {
+      margin: auto;
+    }
+  }
+
+  :where() {
+    opacity: 0;
+    transition: opacity .15s ease,
+      overlay .15s ease allow-discrete,
+      display .15s ease allow-discrete;
+    opacity: 1;
+    background: #0003;
+  }
+
+  @starting-style {
+    :where() {
+      opacity: 0;
+    }
+  }
+
+  @supports (position-anchor: --test) or (position-area: block-end span-inline-start) {
+    :where() {
+      background: none;
+    }
+  }
+
+  :where(.tp-visually-hidden) {
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+    block-size: 1px;
+    inline-size: 1px;
+    margin: -1px;
+    padding: 0;
+    position: absolute;
+    overflow: hidden;
+  }
+
+  :where(.tp-dialog-header) {
+    flex-direction: column;
+    gap: 8px;
+    margin-block-end: 12px;
+    display: flex;
+  }
+
+  :where(.tp-header-nav) {
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    inline-size: 100%;
+    min-inline-size: 0;
+    display: flex;
+  }
+
+  :where(.tp-header-selectors) {
+    flex: auto;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    min-inline-size: 0;
+    display: flex;
+  }
+
+  :where(.tp-btn-prev), :where(.tp-btn-next) {
+    box-sizing: border-box;
+    min-inline-size: var(--tp-target-size);
+    min-block-size: var(--tp-target-size);
+    background: var(--tp-btn-bg);
+    color: var(--tp-btn-text);
+    border: var(--tp-border);
+    border-radius: var(--tp-radius);
+    cursor: pointer;
+    flex: none;
+    justify-content: center;
+    align-items: center;
+    padding: 4px 8px;
+    font-size: 1.125rem;
+    line-height: 1;
+    transition: background-color .15s;
+    display: inline-flex;
+  }
+
+  :where(.tp-btn-prev:hover:not(:disabled)), :where(.tp-btn-next:hover:not(:disabled)) {
+    background: var(--tp-btn-hover-bg);
+  }
+
+  :where(.tp-btn-prev:disabled), :where(.tp-btn-next:disabled) {
+    opacity: .4;
+    cursor: not-allowed;
+  }
+
+  :where(.tp-btn-prev:focus-visible), :where(.tp-btn-next:focus-visible), :where(.tp-select-month:focus-visible), :where(.tp-select-year:focus-visible), :where(.tp-btn-today:focus-visible), :where(.tp-btn-clear:focus-visible) {
+    outline: var(--tp-focus-ring);
+    outline-offset: 2px;
+  }
+
+  :where(.tp-select-month), :where(.tp-select-year) {
+    box-sizing: border-box;
+    background: var(--tp-bg);
+    color: var(--tp-text);
+    border: var(--tp-border);
+    border-radius: var(--tp-radius);
+    font-family: var(--tp-font-family);
+    font-size: var(--tp-font-size);
+    min-block-size: var(--tp-target-size);
+    cursor: pointer;
+    padding: 4px 6px;
+  }
+
+  :where(.tp-select-month) {
+    text-overflow: ellipsis;
+    flex: auto;
+    min-inline-size: 0;
+    max-inline-size: 100%;
+  }
+
+  :where(.tp-select-year) {
+    flex: none;
+    min-inline-size: 0;
+  }
+
+  :where(.tp-live-region) {
+    text-align: center;
+    color: var(--tp-text-muted);
+    min-block-size: 1.25em;
+    font-size: .8125rem;
+  }
+
+  :where(.tp-grid-container) {
+    box-sizing: border-box;
+    margin-block-end: 10px;
+  }
+
+  :where(.tp-grid-table) {
+    border-collapse: collapse;
+    table-layout: fixed;
+    inline-size: 100%;
+  }
+
+  :where(.tp-grid-head-cell) {
+    box-sizing: border-box;
+    color: var(--tp-text-muted);
+    text-align: center;
+    padding: 4px 0 6px;
+    font-size: .75rem;
+    font-weight: 600;
+  }
+
+  :where(.tp-grid-cell) {
+    box-sizing: border-box;
+    text-align: center;
+    padding: 2px;
+  }
+
+  :where(.tp-grid-cell-empty) {
+    padding: 0;
+  }
+
+  :where(.tp-day-btn) {
+    box-sizing: border-box;
+    inline-size: 100%;
+    min-inline-size: var(--tp-target-size);
+    min-block-size: var(--tp-target-size);
+    aspect-ratio: 1;
+    color: var(--tp-text);
+    border-radius: var(--tp-radius);
+    cursor: pointer;
+    font-family: var(--tp-font-family);
+    background: none;
+    border: 1px solid #0000;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    font-size: .875rem;
+    line-height: 1;
+    transition: background-color .12s, border-color .12s, color .12s;
+    display: inline-flex;
+  }
+
+  :where(.tp-day-btn:hover:not(.tp-day-disabled)) {
+    background: var(--tp-btn-hover-bg);
+  }
+
+  :where(.tp-day-btn:focus-visible) {
+    outline: var(--tp-focus-ring);
+    outline-offset: 1px;
+    z-index: 1;
+  }
+
+  :where(.tp-day-btn[aria-current="date"]) {
+    border-color: var(--tp-accent);
+    font-weight: 700;
+  }
+
+  :where(.tp-grid-cell[aria-selected="true"] .tp-day-btn), :where(.tp-day-btn[data-selected="true"]), :where(.tp-day-btn[aria-selected="true"]) {
+    background: var(--tp-accent);
+    color: #fff;
+    border-color: var(--tp-accent);
+    font-weight: 700;
+  }
+
+  :where(.tp-grid-cell[aria-selected="true"] .tp-day-btn:hover), :where(.tp-day-btn[data-selected="true"]:hover), :where(.tp-day-btn[aria-selected="true"]:hover) {
+    background: var(--tp-accent);
+  }
+
+  :where(.tp-day-btn[aria-disabled="true"]), :where(.tp-day-btn.tp-day-disabled) {
+    opacity: .35;
+    cursor: not-allowed;
+  }
+
+  :where(.tp-dialog-footer) {
+    box-sizing: border-box;
+    border-block-start: var(--tp-border);
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding-block-start: 10px;
+    display: flex;
+  }
+
+  :where(.tp-btn-today), :where(.tp-btn-clear) {
+    box-sizing: border-box;
+    min-inline-size: var(--tp-target-size);
+    min-block-size: var(--tp-target-size);
+    background: var(--tp-btn-bg);
+    color: var(--tp-btn-text);
+    border: var(--tp-border);
+    border-radius: var(--tp-radius);
+    cursor: pointer;
+    font-family: var(--tp-font-family);
+    font-size: var(--tp-font-size);
+    justify-content: center;
+    align-items: center;
+    padding: 5px 12px;
+    transition: background-color .15s;
+    display: inline-flex;
+  }
+
+  :where(.tp-btn-today:hover:not(:disabled)), :where(.tp-btn-clear:hover) {
+    background: var(--tp-btn-hover-bg);
+  }
+
+  :where(.tp-btn-today:disabled) {
+    opacity: .4;
+    cursor: not-allowed;
+  }
+
+  @media (width <= 480px) {
+    :where(.tp-dialog) {
+      border-radius: var(--tp-radius) var(--tp-radius) 0 0;
+      max-block-size: 90dvh;
+      inline-size: 100%;
+      max-inline-size: 100%;
+      border-block-end: none;
+      border-inline: none;
+      margin: 0;
+      padding-block-end: max(14px, env(safe-area-inset-bottom, 14px));
+      position: fixed;
+      inset-block: auto 0;
+      inset-inline: 0;
+      transform: translateY(100%);
+      box-shadow: 0 -4px 24px #0003;
+    }
+
+    :where(.tp-dialog[open]) {
+      transform: translateY(0);
+    }
+
+    @starting-style {
+      :where(.tp-dialog[open]) {
+        transform: translateY(100%);
+      }
+    }
+
+    :where() {
+      background: #0006;
+    }
+  }
+
+  @media (pointer: coarse) {
+    :root {
+      --tp-cell-size: 44px;
+      --tp-target-size: 44px;
+    }
+
+    :where(.tp-btn-trigger), :where(.tp-btn-prev), :where(.tp-btn-next), :where(.tp-select-month), :where(.tp-select-year), :where(.tp-btn-today), :where(.tp-btn-clear), :where(.tp-day-btn) {
+      min-block-size: 44px;
+      min-inline-size: 44px;
+    }
+  }
+
+  @media (forced-colors: active) {
+    :where(.tp-dialog) {
+      color: canvastext;
+      background: canvas;
+      border-color: canvastext;
+    }
+
+    :where(.tp-btn-trigger), :where(.tp-btn-prev), :where(.tp-btn-next), :where(.tp-select-month), :where(.tp-select-year), :where(.tp-btn-today), :where(.tp-btn-clear) {
+      color: buttontext;
+      border-color: buttontext;
+    }
+
+    :where(.tp-grid-cell[aria-selected="true"] .tp-day-btn), :where(.tp-day-btn[data-selected="true"]), :where(.tp-day-btn[aria-selected="true"]) {
+      color: highlighttext;
+      background: highlight;
+      border-color: highlight;
+    }
+
+    :where(.tp-day-btn[aria-current="date"]) {
+      border: 2px solid canvastext;
+    }
+
+    :where(.tp-day-btn:focus-visible), :where(.tp-btn-trigger:focus-visible), :where(.tp-btn-prev:focus-visible), :where(.tp-btn-next:focus-visible), :where(.tp-btn-today:focus-visible), :where(.tp-btn-clear:focus-visible) {
+      outline-offset: 2px;
+      outline: 2px solid highlight;
+    }
+
+    :where(.tp-day-btn[aria-disabled="true"]), :where(.tp-day-btn.tp-day-disabled) {
+      color: graytext;
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where(.tp-dialog), :where(), :where(.tp-btn-trigger), :where(.tp-btn-prev), :where(.tp-btn-next), :where(.tp-day-btn), :where(.tp-btn-today), :where(.tp-btn-clear) {
+      transition: none !important;
+      transform: none !important;
+    }
+  }
+}
