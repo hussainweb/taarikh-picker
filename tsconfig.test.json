@@ -1,9 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "noEmit": true,
-    "declaration": false,
-    "isolatedDeclarations": false
-  },
-  "include": ["src", "test", "packages/core/src", "packages/core/test"]
-}

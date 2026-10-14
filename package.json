@@ -1,7 +1,8 @@
 {
-  "name": "@taarikh/picker",
+  "name": "taarikh-monorepo",
   "version": "0.1.0",
-  "description": "Lightweight, accessible Hijri calendar date picker",
+  "private": true,
+  "description": "Monorepo for Taarikh date calculation core and accessible date picker",
   "homepage": "https://github.com/hussainweb/taarikh-picker#readme",
   "license": "MIT",
   "repository": {
@@ -11,39 +12,23 @@
   "workspaces": [
     "packages/*"
   ],
-  "files": [
-    "dist"
-  ],
   "type": "module",
-  "sideEffects": [
-    "*.css"
-  ],
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
-    "./style.css": "./dist/style.css"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
   "scripts": {
     "dev": "vp dev",
-    "build": "vp pack",
-    "typecheck": "tsc --noEmit && tsc -p tsconfig.test.json --noEmit",
-    "typecheck:test": "tsc -p tsconfig.test.json --noEmit",
+    "build:core": "npm run build -w @taarikh/core",
+    "build:picker": "npm run build -w @taarikh/picker",
+    "build": "npm run build:core && npm run build:picker && mkdir -p dist && cp -r packages/picker/dist/* dist/",
+    "typecheck": "tsc --noEmit",
     "check": "vp check",
     "check:fallow": "fallow audit",
     "fallow": "fallow",
     "test": "vp test",
-    "ci": "npm run check && npm run check:fallow && npm run test && npm run build && publint && attw --pack && size-limit"
-  },
-  "dependencies": {
-    "@taarikh/core": "^0.1.0"
+    "test:unit": "npm run test -w @taarikh/core",
+    "test:browser": "npm run test -w @taarikh/picker",
+    "verify:core": "npx publint packages/core && npx attw --pack packages/core",
+    "verify:picker": "npx publint packages/picker && npx attw --pack packages/picker",
+    "verify": "npm run verify:core && npm run verify:picker && npx size-limit",
+    "ci": "npm run check && npm run check:fallow && npm run test && npm run build && npm run verify"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
@@ -60,12 +45,17 @@
   },
   "size-limit": [
     {
-      "name": "ESM",
-      "path": "dist/index.js",
+      "name": "Core ESM",
+      "path": "packages/core/dist/index.js",
+      "limit": "4 KB"
+    },
+    {
+      "name": "Picker ESM",
+      "path": "packages/picker/dist/index.js",
       "limit": "8 KB"
     },
     {
-      "name": "IIFE",
+      "name": "Picker IIFE (Standalone / Drupal)",
       "path": "dist/index.iife.js",
       "limit": "8 KB"
     }

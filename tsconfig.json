@@ -8,13 +8,12 @@
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
     "verbatimModuleSyntax": true,
-    "declaration": true,
-    "isolatedDeclarations": true,
-    "erasableSyntaxOnly": true,
+    "declaration": false,
     "skipLibCheck": true,
     "paths": {
-      "@taarikh/core": ["./packages/core/src/index.ts"]
+      "@taarikh/core": ["./packages/core/src/index.ts"],
+      "@taarikh/picker": ["./packages/picker/src/index.ts"]
     }
   },
-  "include": ["src"]
+  "include": ["packages/*/src", "packages/*/test"]
 }
