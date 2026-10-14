@@ -2,8 +2,7 @@
   :root {
     --tp-font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     --tp-font-size: 0.9375rem;
-    --tp-primary-color: #1a73e8;
-    --tp-accent: var(--tp-primary-color);
+    --tp-accent: #1a73e8;
     --tp-bg: light-dark(#ffffff, #1e1e1e);
     --tp-text: light-dark(#202124, #e8eaed);
     --tp-text-muted: light-dark(#5f6368, #9aa0a6);
@@ -15,13 +14,15 @@
     --tp-btn-hover-bg: light-dark(#f1f3f4, #35363a);
     --tp-btn-text: var(--tp-text);
     --tp-focus-ring: 2px solid var(--tp-accent);
-    --tp-target-size: 32px;
+    --tp-cell-size: 32px;
+    --tp-target-size: var(--tp-cell-size);
     --tp-anchor-offset: 4px;
   }
 
   /* Trigger button adjacent to the input */
   :where(.tp-btn-trigger) {
     box-sizing: border-box;
+    color-scheme: light dark;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -68,6 +69,7 @@
   /* Calendar <dialog> shell */
   :where(.tp-dialog) {
     box-sizing: border-box;
+    color-scheme: light dark;
     padding: 14px;
     background: var(--tp-bg);
     color: var(--tp-text);
@@ -80,11 +82,30 @@
     max-inline-size: min(92vw, 360px);
     overflow: visible;
 
-    /* CSS Anchor Positioning properties */
+    /* CSS Anchor Positioning standard properties */
     position-area: block-end span-inline-start;
     position-try-fallbacks: flip-block, flip-inline;
-    position-try-options: flip-block, flip-inline;
-    inset-area: block-end span-inline-start;
+
+    /* Discrete entrance transition */
+    opacity: 0;
+    transform: scale(0.96);
+    transition:
+      opacity 150ms ease,
+      transform 150ms ease,
+      overlay 150ms ease allow-discrete,
+      display 150ms ease allow-discrete;
+  }
+
+  :where(.tp-dialog[open]) {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  @starting-style {
+    :where(.tp-dialog[open]) {
+      opacity: 0;
+      transform: scale(0.96);
+    }
   }
 
   /* Reset margin when anchor positioning is active */
@@ -105,6 +126,21 @@
   /* Backdrop: transparent when anchored, subtle veil when centered */
   :where(.tp-dialog::backdrop) {
     background: rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transition:
+      opacity 150ms ease,
+      overlay 150ms ease allow-discrete,
+      display 150ms ease allow-discrete;
+  }
+
+  :where(.tp-dialog[open]::backdrop) {
+    opacity: 1;
+  }
+
+  @starting-style {
+    :where(.tp-dialog[open]::backdrop) {
+      opacity: 0;
+    }
   }
 
   @supports (position-anchor: --test) or (position-area: block-end span-inline-start) {
@@ -328,8 +364,129 @@
     transition: background-color 150ms ease;
   }
 
-  :where(.tp-btn-today:hover),
+  :where(.tp-btn-today:hover:not(:disabled)),
   :where(.tp-btn-clear:hover) {
     background: var(--tp-btn-hover-bg);
+  }
+
+  :where(.tp-btn-today:disabled) {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* Small viewports: mobile bottom sheet */
+  @media (max-width: 480px) {
+    :where(.tp-dialog) {
+      position: fixed;
+      inset-block-start: auto;
+      inset-block-end: 0;
+      inset-inline-start: 0;
+      inset-inline-end: 0;
+      inline-size: 100%;
+      max-inline-size: 100%;
+      max-block-size: 90dvh;
+      margin: 0;
+      border-radius: var(--tp-radius) var(--tp-radius) 0 0;
+      border-block-end: none;
+      border-inline: none;
+      padding-block-end: max(14px, env(safe-area-inset-bottom, 14px));
+      box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.2);
+      transform: translateY(100%);
+    }
+
+    :where(.tp-dialog[open]) {
+      transform: translateY(0);
+    }
+
+    @starting-style {
+      :where(.tp-dialog[open]) {
+        transform: translateY(100%);
+      }
+    }
+
+    :where(.tp-dialog::backdrop) {
+      background: rgba(0, 0, 0, 0.4);
+    }
+  }
+
+  /* Touch / Coarse pointer: target sizes >= 44px (WCAG 2.5.5) */
+  @media (pointer: coarse) {
+    :root {
+      --tp-cell-size: 44px;
+      --tp-target-size: 44px;
+    }
+
+    :where(.tp-btn-trigger),
+    :where(.tp-btn-prev),
+    :where(.tp-btn-next),
+    :where(.tp-select-month),
+    :where(.tp-select-year),
+    :where(.tp-btn-today),
+    :where(.tp-btn-clear),
+    :where(.tp-day-btn) {
+      min-inline-size: 44px;
+      min-block-size: 44px;
+    }
+  }
+
+  /* High contrast / Forced colors mode */
+  @media (forced-colors: active) {
+    :where(.tp-dialog) {
+      background: Canvas;
+      color: CanvasText;
+      border-color: CanvasText;
+    }
+
+    :where(.tp-btn-trigger),
+    :where(.tp-btn-prev),
+    :where(.tp-btn-next),
+    :where(.tp-select-month),
+    :where(.tp-select-year),
+    :where(.tp-btn-today),
+    :where(.tp-btn-clear) {
+      border-color: ButtonText;
+      color: ButtonText;
+    }
+
+    :where(.tp-day-btn[aria-selected="true"]) {
+      background: Highlight;
+      color: HighlightText;
+      border-color: Highlight;
+    }
+
+    :where(.tp-day-btn[aria-current="date"]) {
+      border: 2px solid CanvasText;
+    }
+
+    :where(.tp-day-btn:focus-visible),
+    :where(.tp-btn-trigger:focus-visible),
+    :where(.tp-btn-prev:focus-visible),
+    :where(.tp-btn-next:focus-visible),
+    :where(.tp-btn-today:focus-visible),
+    :where(.tp-btn-clear:focus-visible) {
+      outline: 2px solid Highlight;
+      outline-offset: 2px;
+    }
+
+    :where(.tp-day-btn[aria-disabled="true"]),
+    :where(.tp-day-btn.tp-day-disabled) {
+      color: GrayText;
+      opacity: 1;
+    }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    :where(.tp-dialog),
+    :where(.tp-dialog::backdrop),
+    :where(.tp-btn-trigger),
+    :where(.tp-btn-prev),
+    :where(.tp-btn-next),
+    :where(.tp-day-btn),
+    :where(.tp-btn-today),
+    :where(.tp-btn-clear) {
+      transition: none !important;
+      transform: none !important;
+    }
   }
 }
