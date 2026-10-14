@@ -189,18 +189,14 @@ export class DialogShell {
   }
 
   public isOpen(): boolean {
-    return this.elements.dialog.open || this.elements.dialog.hasAttribute("open");
+    return this.elements.dialog.open;
   }
 
   public open(): void {
     if (this.destroyed || this.isOpen()) {
       return;
     }
-    if (typeof this.elements.dialog.showModal === "function") {
-      this.elements.dialog.showModal();
-    } else {
-      this.elements.dialog.setAttribute("open", "");
-    }
+    this.elements.dialog.showModal();
     this.elements.trigger.setAttribute("aria-expanded", "true");
     this.options.onOpen?.();
   }
@@ -209,18 +205,9 @@ export class DialogShell {
     if (this.destroyed || !this.isOpen()) {
       return;
     }
-    if (typeof this.elements.dialog.close === "function") {
-      this.elements.dialog.close();
-    } else {
-      this.elements.dialog.removeAttribute("open");
-      this.elements.dialog.dispatchEvent(new Event("close"));
-    }
+    this.elements.dialog.close();
     this.elements.trigger.setAttribute("aria-expanded", "false");
-    try {
-      this.elements.trigger.focus();
-    } catch {
-      // Safe in non-browser or detached test environments
-    }
+    this.elements.trigger.focus();
   }
 
   public setVisibleDate(date: PlainDate): void {
@@ -284,21 +271,15 @@ export class DialogShell {
       "click",
       (e: MouseEvent) => {
         if (e.target === dialog) {
-          if (typeof dialog.getBoundingClientRect === "function") {
-            const rect = dialog.getBoundingClientRect();
-            if (rect.width > 0 && rect.height > 0) {
-              const isInside =
-                e.clientX >= rect.left &&
-                e.clientX <= rect.right &&
-                e.clientY >= rect.top &&
-                e.clientY <= rect.bottom;
-              if (!isInside) {
-                this.close();
-              }
-              return;
-            }
+          const rect = dialog.getBoundingClientRect();
+          const isInside =
+            e.clientX >= rect.left &&
+            e.clientX <= rect.right &&
+            e.clientY >= rect.top &&
+            e.clientY <= rect.bottom;
+          if (!isInside) {
+            this.close();
           }
-          this.close();
         }
       },
       { signal },

@@ -5,35 +5,27 @@ import type { MonthLabels, PlainDate } from "../../src/engine/index.js";
 import { fatimidAstronomicalCalendar } from "../../src/engine/index.js";
 import { formatDayAriaLabel, formatMonthHeading } from "../../src/format/index.js";
 import { resetUniqueIdCounter } from "../../src/ui/dom.js";
-import {
-  type MockDocument,
-  type MockElement,
-  setupMockDom,
-  teardownMockDom,
-} from "../helpers/mock-dom.js";
 
 describe("DialogShell - WAI-ARIA APG Date Picker Dialog", () => {
-  let doc: MockDocument;
-  let container: MockElement;
-  let input: MockElement;
+  let container: HTMLFormElement;
+  let input: HTMLInputElement;
 
   beforeEach(() => {
     resetUniqueIdCounter();
-    const env = setupMockDom();
-    doc = env.document;
-    container = doc.createElement("form");
-    doc.body.appendChild(container);
-    input = doc.createElement("input");
+    container = document.createElement("form");
+    document.body.appendChild(container);
+    input = document.createElement("input");
     input.type = "text";
     container.appendChild(input);
   });
 
   afterEach(() => {
-    teardownMockDom();
+    container.remove();
+    document.body.innerHTML = "";
   });
 
   it("creates sibling trigger button and dialog without wrapping the input", () => {
-    const shell = new DialogShell(input as unknown as HTMLInputElement);
+    const shell = new DialogShell(input);
     const elements = shell.getElements();
 
     // The input is still in container
@@ -63,7 +55,7 @@ describe("DialogShell - WAI-ARIA APG Date Picker Dialog", () => {
   });
 
   it("contains header, selectors, live region, grid container, and footer", () => {
-    const shell = new DialogShell(input as unknown as HTMLInputElement, {
+    const shell = new DialogShell(input, {
       initialDate: { year: 1448, month: 1, day: 15 },
     });
     const elements = shell.getElements();
@@ -91,42 +83,43 @@ describe("DialogShell - WAI-ARIA APG Date Picker Dialog", () => {
     expect(elements.btnClear.textContent).toBe("Clear");
   });
 
-  it("opens with showModal() on trigger click and closes on subsequent click", () => {
+  it("opens with showModal() on trigger click and closes on subsequent click", async () => {
     const onOpen = vi.fn();
     const onClose = vi.fn();
-    const shell = new DialogShell(input as unknown as HTMLInputElement, { onOpen, onClose });
+    const shell = new DialogShell(input, { onOpen, onClose });
     const elements = shell.getElements();
 
     expect(shell.isOpen()).toBe(false);
     expect(elements.trigger.getAttribute("aria-expanded")).toBe("false");
 
     // Click trigger to open
-    elements.trigger.dispatchEvent(new Event("click"));
+    elements.trigger.click();
     expect(shell.isOpen()).toBe(true);
     expect(elements.trigger.getAttribute("aria-expanded")).toBe("true");
     expect(onOpen).toHaveBeenCalledTimes(1);
 
     // Click trigger to close
-    elements.trigger.dispatchEvent(new Event("click"));
+    elements.trigger.click();
     expect(shell.isOpen()).toBe(false);
     expect(elements.trigger.getAttribute("aria-expanded")).toBe("false");
-    expect(onClose).toHaveBeenCalledTimes(1);
+    await vi.waitFor(() => {
+      expect(onClose).toHaveBeenCalledTimes(1);
+    });
   });
 
   it("closes when clicking directly on the dialog backdrop", () => {
-    const shell = new DialogShell(input as unknown as HTMLInputElement);
+    const shell = new DialogShell(input);
     const elements = shell.getElements();
 
     shell.open();
     expect(shell.isOpen()).toBe(true);
 
-    // Synthetic click on backdrop (e.target === dialog outside bounding box)
+    const rect = elements.dialog.getBoundingClientRect();
     const backdropClick = new MouseEvent("click", {
       bubbles: true,
-      clientX: 50, // Outside rect [100, 400]
-      clientY: 50,
+      clientX: rect.left - 20,
+      clientY: rect.top - 20,
     });
-    Object.defineProperty(backdropClick, "target", { value: elements.dialog });
     elements.dialog.dispatchEvent(backdropClick);
 
     expect(shell.isOpen()).toBe(false);
@@ -134,7 +127,7 @@ describe("DialogShell - WAI-ARIA APG Date Picker Dialog", () => {
   });
 
   it("does NOT close when clicking inside the dialog content", () => {
-    const shell = new DialogShell(input as unknown as HTMLInputElement);
+    const shell = new DialogShell(input);
     const elements = shell.getElements();
 
     shell.open();
@@ -142,15 +135,14 @@ describe("DialogShell - WAI-ARIA APG Date Picker Dialog", () => {
 
     // Click inside header
     const innerClick = new MouseEvent("click", { bubbles: true, clientX: 150, clientY: 150 });
-    Object.defineProperty(innerClick, "target", { value: elements.header });
-    elements.dialog.dispatchEvent(innerClick);
+    elements.header.dispatchEvent(innerClick);
 
     expect(shell.isOpen()).toBe(true);
   });
 
   it("navigates months with previous and next buttons and announces via live region", () => {
     const onMonthChange = vi.fn();
-    const shell = new DialogShell(input as unknown as HTMLInputElement, {
+    const shell = new DialogShell(input, {
       initialDate: { year: 1448, month: 1, day: 10 },
       onMonthChange,
     });
@@ -159,7 +151,7 @@ describe("DialogShell - WAI-ARIA APG Date Picker Dialog", () => {
     expect(elements.liveRegion.textContent).toBe("Moharram al-Haraam 1448");
 
     // Click Next month
-    elements.btnNext.dispatchEvent(new Event("click"));
+    elements.btnNext.click();
     expect(shell.getVisibleDate().month).toBe(2);
     expect(shell.getVisibleDate().year).toBe(1448);
     expect(elements.selectMonth.value).toBe("2");
@@ -167,7 +159,7 @@ describe("DialogShell - WAI-ARIA APG Date Picker Dialog", () => {
     expect(onMonthChange).toHaveBeenCalledWith(expect.objectContaining({ month: 2, year: 1448 }));
 
     // Click Prev month
-    elements.btnPrev.dispatchEvent(new Event("click"));
+    elements.btnPrev.click();
     expect(shell.getVisibleDate().month).toBe(1);
     expect(shell.getVisibleDate().year).toBe(1448);
     expect(elements.selectMonth.value).toBe("1");
@@ -175,7 +167,7 @@ describe("DialogShell - WAI-ARIA APG Date Picker Dialog", () => {
   });
 
   it("updates visible date when month or year selects change", () => {
-    const shell = new DialogShell(input as unknown as HTMLInputElement, {
+    const shell = new DialogShell(input, {
       initialDate: { year: 1448, month: 1, day: 10 },
     });
     const elements = shell.getElements();
@@ -197,7 +189,7 @@ describe("DialogShell - WAI-ARIA APG Date Picker Dialog", () => {
     const minDate: PlainDate = { year: 1448, month: 2, day: 1 };
     const maxDate: PlainDate = { year: 1448, month: 4, day: 29 };
 
-    const shell = new DialogShell(input as unknown as HTMLInputElement, {
+    const shell = new DialogShell(input, {
       initialDate: { year: 1448, month: 2, day: 10 },
       minDate,
       maxDate,
@@ -210,12 +202,12 @@ describe("DialogShell - WAI-ARIA APG Date Picker Dialog", () => {
     expect(elements.btnNext.disabled).toBe(false);
 
     // Advance to month 3
-    elements.btnNext.dispatchEvent(new Event("click"));
+    elements.btnNext.click();
     expect(elements.btnPrev.disabled).toBe(false);
     expect(elements.btnNext.disabled).toBe(false);
 
     // Advance to month 4 (maxDate): next button should be disabled
-    elements.btnNext.dispatchEvent(new Event("click"));
+    elements.btnNext.click();
     expect(elements.btnNext.disabled).toBe(true);
     expect(elements.btnNext.getAttribute("aria-disabled")).toBe("true");
     expect(elements.btnPrev.disabled).toBe(false);
@@ -224,7 +216,7 @@ describe("DialogShell - WAI-ARIA APG Date Picker Dialog", () => {
   it("handles Today and Clear footer buttons", () => {
     const onToday = vi.fn();
     const onClear = vi.fn();
-    const shell = new DialogShell(input as unknown as HTMLInputElement, {
+    const shell = new DialogShell(input, {
       initialDate: { year: 1400, month: 1, day: 1 },
       onToday,
       onClear,
@@ -234,12 +226,12 @@ describe("DialogShell - WAI-ARIA APG Date Picker Dialog", () => {
     input.value = "1400-01-01";
 
     // Click Today
-    elements.btnToday.dispatchEvent(new Event("click"));
+    elements.btnToday.click();
     expect(onToday).toHaveBeenCalled();
     expect(shell.getVisibleDate().year).toBeGreaterThan(1440);
 
     // Click Clear
-    elements.btnClear.dispatchEvent(new Event("click"));
+    elements.btnClear.click();
     expect(input.value).toBe("");
     expect(onClear).toHaveBeenCalled();
   });
@@ -247,7 +239,7 @@ describe("DialogShell - WAI-ARIA APG Date Picker Dialog", () => {
   it("provides complete, idempotent destroy() lifecycle unbinding listeners and removing DOM nodes", () => {
     input.style.setProperty("anchor-name", "--original-anchor");
 
-    const shell = new DialogShell(input as unknown as HTMLInputElement);
+    const shell = new DialogShell(input);
     const elements = shell.getElements();
 
     shell.open();
@@ -269,7 +261,7 @@ describe("DialogShell - WAI-ARIA APG Date Picker Dialog", () => {
 
   it("ensures dialog month name matches formatMonthHeading and formatDayAriaLabel", () => {
     const testDate: PlainDate = { year: 1445, month: 9, day: 1 };
-    const shell = new DialogShell(input as unknown as HTMLInputElement, {
+    const shell = new DialogShell(input, {
       initialDate: testDate,
     });
     const elements = shell.getElements();
@@ -302,7 +294,7 @@ describe("DialogShell - WAI-ARIA APG Date Picker Dialog", () => {
       short: ["M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8", "M9", "M10", "M11", "M12"],
     };
 
-    const shell = new DialogShell(input as unknown as HTMLInputElement, {
+    const shell = new DialogShell(input, {
       initialDate: { year: 1448, month: 3, day: 1 },
       labels: { months: customLabels },
     });
@@ -313,7 +305,7 @@ describe("DialogShell - WAI-ARIA APG Date Picker Dialog", () => {
   });
 
   it("uses fatimidAstronomicalCalendar as the default calendar engine", () => {
-    const shell = new DialogShell(input as unknown as HTMLInputElement, {
+    const shell = new DialogShell(input, {
       initialDate: { year: 1445, month: 12, day: 29 },
     });
     const elements = shell.getElements();
@@ -325,19 +317,20 @@ describe("DialogShell - WAI-ARIA APG Date Picker Dialog", () => {
 });
 
 describe("TaarikhPicker & createPicker API", () => {
+  let input: HTMLInputElement;
+
   beforeEach(() => {
-    setupMockDom();
+    input = document.createElement("input");
+    document.body.appendChild(input);
   });
 
   afterEach(() => {
-    teardownMockDom();
+    input.remove();
+    document.body.innerHTML = "";
   });
 
   it("creates a picker instance with createPicker(input, options)", () => {
-    const input = document.createElement("input");
-    document.body.appendChild(input);
-
-    const picker = createPicker(input as unknown as HTMLInputElement, {
+    const picker = createPicker(input, {
       initialDate: { year: 1448, month: 1, day: 1 },
     });
 
