@@ -1,0 +1,77 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (semver without 'v', e.g. 0.1.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+
+      - name: Upgrade npm to >= 11.5.1
+        run: npm install -g npm@^11.5.1
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Quality gates
+        run: |
+          npm run check
+          npm test
+          npm run typecheck
+
+      - name: Set package version
+        run: npm version ${{ inputs.version }} --no-git-tag-version
+
+      - name: Build distribution assets
+        run: npm run build
+
+      - name: Verify package
+        run: |
+          npx publint
+          npx attw --pack
+          npx size-limit
+
+      - name: Create detached release commit and tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout --detach
+          git add -f dist
+          git add package.json package-lock.json
+          if [ -f composer.json ]; then
+            git add composer.json
+          fi
+          git commit -m "release: v${{ inputs.version }}"
+          git tag "v${{ inputs.version }}"
+          git push origin "v${{ inputs.version }}"
+
+      - name: Create GitHub Release
+        run: gh release create "v${{ inputs.version }}" --title "v${{ inputs.version }}" --generate-notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to npm with Trusted Publishing (OIDC)
+        run: npm publish --provenance --access public
