@@ -40,3 +40,61 @@ For non-skill agents, treat the task map below as the local onboarding source: r
 | scope a monorepo                                                     | `--workspace <glob> / --changed-workspaces <ref>` (global flags, prefix any command)                                                                          |
 
 <!-- fallow:setup-hooks:end -->
+
+---
+
+## Releases & Tagging
+
+Releases are published to **both** npm (`@taarikh/picker`) and Packagist (`hussainweb/taarikh-picker`).
+
+### Dual Distribution Contract
+
+- On `main`, compiled assets in `dist/` are intentionally gitignored.
+- For Drupal sites installing via Composer / Packagist, the git release tag must contain compiled assets so Drupal can load `libraries/taarikh-picker/dist/index.js` without requiring Node.js or a build step.
+- **Never create or push a release tag directly on `main` without `dist/`**. Always use the automated release workflow.
+
+### When to Initiate a Release
+
+An agent should suggest or initiate a release when:
+
+1. A release milestone, task, or epic is marked complete.
+2. Features, fixes, or breaking changes have landed on `main` and all quality gates (`npm run ci`) pass.
+3. Explicit user instruction or approval is given to cut a release.
+
+### Release Workflow Steps
+
+Releases are automated through [`.github/workflows/release.yml`](.github/workflows/release.yml):
+
+1. **Verify Quality Gates**:
+   Ensure all checks pass locally and in CI:
+
+   ```bash
+   npm run ci
+   ```
+
+2. **Trigger the Release Workflow**:
+   Trigger the workflow with the target semver (omit the leading `v`):
+
+   ```bash
+   gh workflow run release.yml -f version=<semver>
+   ```
+
+   _(e.g., `gh workflow run release.yml -f version=0.2.0`)_
+
+3. **What the Workflow Executes Automatically**:
+   - Runs full quality checks (`npm run check`, `npm test`, `npm run typecheck`).
+   - Updates version in `package.json` and compiles fresh `dist/` assets (`npm run build`).
+   - Validates package integrity (`publint`, `attw --pack`, `size-limit`).
+   - Checks out detached HEAD, force-adds `dist/`, and commits the release assets.
+   - Creates and pushes git tag `v<version>`.
+   - Creates a GitHub Release with auto-generated release notes.
+   - Publishes to npm using OIDC Trusted Publishing with provenance (`--provenance --access public`).
+
+4. **Monitor and Verify**:
+   - Watch the workflow run:
+     ```bash
+     gh run list --workflow=release.yml --limit 1
+     gh run watch <run-id>
+     ```
+   - Verify GitHub release: `gh release view v<version>`
+   - Verify npm: `npm view @taarikh/picker version`
