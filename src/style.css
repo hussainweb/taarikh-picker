@@ -317,6 +317,8 @@
     font-weight: 700;
   }
 
+  :where(.tp-grid-cell[aria-selected="true"] .tp-day-btn),
+  :where(.tp-day-btn[data-selected="true"]),
   :where(.tp-day-btn[aria-selected="true"]) {
     background: var(--tp-accent);
     color: #ffffff;
@@ -324,6 +326,8 @@
     border-color: var(--tp-accent);
   }
 
+  :where(.tp-grid-cell[aria-selected="true"] .tp-day-btn:hover),
+  :where(.tp-day-btn[data-selected="true"]:hover),
   :where(.tp-day-btn[aria-selected="true"]:hover) {
     background: var(--tp-accent);
   }
@@ -448,6 +452,8 @@
       color: ButtonText;
     }
 
+    :where(.tp-grid-cell[aria-selected="true"] .tp-day-btn),
+    :where(.tp-day-btn[data-selected="true"]),
     :where(.tp-day-btn[aria-selected="true"]) {
       background: Highlight;
       color: HighlightText;

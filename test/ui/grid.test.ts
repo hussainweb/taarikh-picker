@@ -79,15 +79,21 @@ describe("MonthGrid - WAI-ARIA APG Date Picker Grid & WCAG 2.2 AA", () => {
       selectedDate,
     });
     container.appendChild(grid.getElement());
-
     const table = grid.getElement();
-    const selectedBtn = table.querySelector(".tp-day-btn[aria-selected='true']");
+
+    const selectedCell = table.querySelector(".tp-grid-cell[aria-selected='true']");
+    expect(selectedCell).not.toBeNull();
+    expect(selectedCell?.textContent).toBe("15");
+
+    const selectedBtn = table.querySelector(".tp-day-btn[data-selected='true']");
     expect(selectedBtn).not.toBeNull();
     expect(selectedBtn?.textContent).toBe("15");
 
-    // All other buttons have aria-selected="false"
-    const unselectedBtns = table.querySelectorAll(".tp-day-btn[aria-selected='false']");
-    expect(unselectedBtns.length).toBe(29);
+    // All other cells have aria-selected="false"
+    const unselectedCells = table.querySelectorAll(
+      ".tp-grid-cell:not(.tp-grid-cell-empty)[aria-selected='false']",
+    );
+    expect(unselectedCells.length).toBe(29);
 
     // Accessible name includes weekday, day, month, and year
     const day1Btn = table.querySelectorAll(".tp-day-btn")[0];

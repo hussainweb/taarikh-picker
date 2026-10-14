@@ -275,9 +275,10 @@ export class MonthGrid {
       );
       btn.setAttribute("aria-label", ariaLabel);
 
-      // Selected state
+      // Selected state on the gridcell (WAI-ARIA: aria-selected belongs on gridcell, not button)
       const isSelected = this.selectedDate !== undefined && isSameDay(date, this.selectedDate);
-      btn.setAttribute("aria-selected", isSelected ? "true" : "false");
+      td.setAttribute("aria-selected", isSelected ? "true" : "false");
+      btn.dataset.selected = isSelected ? "true" : "false";
 
       // Today state
       if (isSameDay(date, todayDate)) {
@@ -324,7 +325,11 @@ export class MonthGrid {
         day,
       };
       const isSelected = this.selectedDate !== undefined && isSameDay(date, this.selectedDate);
-      btn.setAttribute("aria-selected", isSelected ? "true" : "false");
+      btn.dataset.selected = isSelected ? "true" : "false";
+      const cell = btn.parentElement;
+      if (cell) {
+        cell.setAttribute("aria-selected", isSelected ? "true" : "false");
+      }
     }
   }
 
