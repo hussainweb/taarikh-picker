@@ -87,7 +87,7 @@ describe("Input binding, typed validation, and events (tp-il8.3.3)", () => {
       expect(shell.getVisibleDate()).toEqual({ year: 1446, month: 12, day: 29 });
 
       expect(onTaarikhChange).toHaveBeenCalledTimes(1);
-      const detail = onTaarikhChange.mock.calls[0][0].detail;
+      const detail = onTaarikhChange.mock.calls[0]![0].detail;
       expect(detail).toEqual({
         date: { year: 1446, month: 12, day: 29 },
         value: "1446-12-29",
@@ -165,7 +165,7 @@ describe("Input binding, typed validation, and events (tp-il8.3.3)", () => {
       expect(input.validationMessage).toBe("");
       expect(shell.getSelectedDate()).toBeUndefined();
       expect(onTaarikhChange).toHaveBeenCalledTimes(1);
-      expect(onTaarikhChange.mock.calls[0][0].detail).toEqual({
+      expect(onTaarikhChange.mock.calls[0]![0].detail).toEqual({
         date: null,
         value: "",
       });
@@ -197,7 +197,7 @@ describe("Input binding, typed validation, and events (tp-il8.3.3)", () => {
       expect(onInput).toHaveBeenCalledTimes(1);
       expect(onChange).toHaveBeenCalledTimes(1);
       expect(onTaarikhChange).toHaveBeenCalledTimes(1);
-      expect(onTaarikhChange.mock.calls[0][0].detail).toEqual({
+      expect(onTaarikhChange.mock.calls[0]![0].detail).toEqual({
         date: targetDate,
         value: "1445-09-05",
       });
@@ -247,7 +247,7 @@ describe("Input binding, typed validation, and events (tp-il8.3.3)", () => {
       expect(onInput).toHaveBeenCalledTimes(1);
       expect(onChange).toHaveBeenCalledTimes(1);
       expect(onTaarikhChange).toHaveBeenCalledTimes(1);
-      expect(onTaarikhChange.mock.calls[0][0].detail).toEqual({
+      expect(onTaarikhChange.mock.calls[0]![0].detail).toEqual({
         date: null,
         value: "",
       });

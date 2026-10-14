@@ -77,7 +77,9 @@ describe("Browser interaction and accessibility test suite (tp-il8.3.8)", () => 
       expect(elements.trigger.getAttribute("aria-expanded")).toBe("true");
 
       // Active day (1st of Ramadan) is focused
-      const day1 = elements.grid.querySelector<HTMLButtonElement>('button[data-date="1445-09-01"]');
+      const day1 = elements.grid!.querySelector<HTMLButtonElement>(
+        'button[data-date="1445-09-01"]',
+      );
       expect(day1).not.toBeNull();
       expect(document.activeElement).toBe(day1);
 
@@ -122,14 +124,14 @@ describe("Browser interaction and accessibility test suite (tp-il8.3.8)", () => 
       const elements = picker.getElements()!;
       picker.open();
 
-      const day10 = elements.grid.querySelector<HTMLButtonElement>(
+      const day10 = elements.grid!.querySelector<HTMLButtonElement>(
         'button[data-date="1445-09-10"]',
       )!;
       expect(document.activeElement).toBe(day10);
 
       // ArrowRight -> day 11
       day10.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
-      const day11 = elements.grid.querySelector<HTMLButtonElement>(
+      const day11 = elements.grid!.querySelector<HTMLButtonElement>(
         'button[data-date="1445-09-11"]',
       )!;
       expect(document.activeElement).toBe(day11);
@@ -151,14 +153,14 @@ describe("Browser interaction and accessibility test suite (tp-il8.3.8)", () => 
 
       picker.open();
 
-      const day10 = elements.grid.querySelector<HTMLButtonElement>(
+      const day10 = elements.grid!.querySelector<HTMLButtonElement>(
         'button[data-date="1445-09-10"]',
       )!;
       expect(document.activeElement).toBe(day10);
 
       // In RTL, ArrowRight moves to PREVIOUS day (day 9)
       day10.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
-      const day9 = elements.grid.querySelector<HTMLButtonElement>(
+      const day9 = elements.grid!.querySelector<HTMLButtonElement>(
         'button[data-date="1445-09-09"]',
       )!;
       expect(document.activeElement).toBe(day9);
@@ -177,13 +179,13 @@ describe("Browser interaction and accessibility test suite (tp-il8.3.8)", () => 
       const elements = picker.getElements()!;
       picker.open();
 
-      const day10 = elements.grid.querySelector<HTMLButtonElement>(
+      const day10 = elements.grid!.querySelector<HTMLButtonElement>(
         'button[data-date="1445-09-10"]',
       )!;
 
       // ArrowDown -> day 17 (+7 days)
       day10.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
-      const day17 = elements.grid.querySelector<HTMLButtonElement>(
+      const day17 = elements.grid!.querySelector<HTMLButtonElement>(
         'button[data-date="1445-09-17"]',
       )!;
       expect(document.activeElement).toBe(day17);
@@ -197,14 +199,14 @@ describe("Browser interaction and accessibility test suite (tp-il8.3.8)", () => 
       expect(picker.getVisibleDate()?.month).toBe(10);
 
       // PageUp -> previous month (Ramadan 10)
-      const dayShawwal10 = elements.grid.querySelector<HTMLButtonElement>(
+      const dayShawwal10 = elements.grid!.querySelector<HTMLButtonElement>(
         'button[data-date="1445-10-10"]',
       )!;
       dayShawwal10.dispatchEvent(new KeyboardEvent("keydown", { key: "PageUp", bubbles: true }));
       expect(picker.getVisibleDate()?.month).toBe(9);
 
       // Shift+PageDown -> next year (1446)
-      const dayRamadan10 = elements.grid.querySelector<HTMLButtonElement>(
+      const dayRamadan10 = elements.grid!.querySelector<HTMLButtonElement>(
         'button[data-date="1445-09-10"]',
       )!;
       dayRamadan10.dispatchEvent(
@@ -213,7 +215,7 @@ describe("Browser interaction and accessibility test suite (tp-il8.3.8)", () => 
       expect(picker.getVisibleDate()?.year).toBe(1446);
 
       // Shift+PageUp -> previous year (1445)
-      const day1446 = elements.grid.querySelector<HTMLButtonElement>(
+      const day1446 = elements.grid!.querySelector<HTMLButtonElement>(
         'button[data-date="1446-09-10"]',
       )!;
       day1446.dispatchEvent(
@@ -235,7 +237,7 @@ describe("Browser interaction and accessibility test suite (tp-il8.3.8)", () => 
       const elements = picker.getElements()!;
       picker.open();
 
-      const day5 = elements.grid.querySelector<HTMLButtonElement>(
+      const day5 = elements.grid!.querySelector<HTMLButtonElement>(
         'button[data-date="1445-09-05"]',
       )!;
       expect(day5.getAttribute("aria-disabled")).toBe("true");
@@ -253,7 +255,7 @@ describe("Browser interaction and accessibility test suite (tp-il8.3.8)", () => 
       expect(picker.getDate()).toBeNull();
 
       // Enabled day within range can be selected
-      const day10 = elements.grid.querySelector<HTMLButtonElement>(
+      const day10 = elements.grid!.querySelector<HTMLButtonElement>(
         'button[data-date="1445-09-10"]',
       )!;
       expect(day10.getAttribute("aria-disabled")).toBeNull();

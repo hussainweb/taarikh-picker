@@ -120,7 +120,7 @@ describe("getWeekdayNames", () => {
 
   it("localizes weekday names according to locale", () => {
     const french = getWeekdayNames("fr", "long", 0);
-    expect(french[0].toLowerCase()).toBe("dimanche");
+    expect(french[0]?.toLowerCase()).toBe("dimanche");
   });
 });
 

@@ -23,7 +23,8 @@
   "scripts": {
     "dev": "vp dev",
     "build": "vp pack",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.test.json --noEmit",
+    "typecheck:test": "tsc -p tsconfig.test.json --noEmit",
     "check": "vp check",
     "test": "vp test",
     "ci": "npm run check && npm run test && npm run build && publint && attw --pack && size-limit"
