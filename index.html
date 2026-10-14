@@ -249,6 +249,17 @@
 
       let picker = null;
 
+      input.addEventListener("change", () => {
+        log(
+          `Input change event: value="${input.value}", aria-invalid="${input.getAttribute("aria-invalid")}"`,
+        );
+      });
+      input.addEventListener("taarikh:change", (e) => {
+        log(
+          `Custom taarikh:change: date=${JSON.stringify(e.detail.date)}, value="${e.detail.value}"`,
+        );
+      });
+
       function initPicker() {
         picker = createPicker(input, {
           onOpen: () => log("Event: dialog opened"),

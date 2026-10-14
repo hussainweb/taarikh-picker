@@ -31,6 +31,8 @@ export const DEFAULT_LABELS: ResolvedPickerLabels = {
   clear: "Clear",
   dialogTitle: "Choose date",
   months: DEFAULT_MONTH_LABELS,
+  invalidDate: "Please enter a valid date",
+  outOfRange: "Date is out of range",
 };
 
 /**

@@ -14,6 +14,8 @@ export interface PickerLabels {
   readonly clear?: string | undefined;
   readonly dialogTitle?: string | undefined;
   readonly months?: MonthLabels | undefined;
+  readonly invalidDate?: string | undefined;
+  readonly outOfRange?: string | undefined;
 }
 
 /**
@@ -29,6 +31,8 @@ export interface ResolvedPickerLabels {
   readonly clear: string;
   readonly dialogTitle: string;
   readonly months: MonthLabels;
+  readonly invalidDate: string;
+  readonly outOfRange: string;
 }
 
 /**
@@ -65,6 +69,7 @@ export interface DialogShellOptions {
   readonly firstDayOfWeek?: number | undefined;
   readonly locale?: string | undefined;
   readonly isRtl?: boolean | undefined;
+  readonly valuePattern?: string | undefined;
   readonly onMonthChange?: ((date: PlainDate) => void) | undefined;
   readonly onToday?: ((todayDate: PlainDate) => void) | undefined;
   readonly onClear?: (() => void) | undefined;

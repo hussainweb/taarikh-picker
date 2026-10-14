@@ -1,7 +1,8 @@
 import type { CalendarEngine, PlainDate } from "../engine/types.js";
 import { fatimidAstronomicalCalendar } from "../engine/fatimid.js";
-import { addMonths, today } from "../engine/helpers.js";
+import { addMonths, isAfter, isBefore, today } from "../engine/helpers.js";
 import { getMonthName } from "../engine/labels.js";
+import { formatValue, parseValue } from "../format/value.js";
 import { CALENDAR_SVG_ICON, DEFAULT_LABELS, nextUniqueId } from "./dom.js";
 import { MonthGrid } from "./grid.js";
 import type { DialogElements, DialogShellOptions, ResolvedPickerLabels } from "./types.js";
@@ -26,15 +27,18 @@ export class DialogShell {
   private readonly abortController: AbortController = new AbortController();
   private readonly elements: DialogElements;
   private readonly grid: MonthGrid;
+  private readonly valuePattern: string;
   private visibleDate: PlainDate;
   private selectedDate: PlainDate | undefined;
   private destroyed: boolean = false;
   private previousAnchorName: string = "";
+  private isProgrammaticChange: boolean = false;
 
   public constructor(input: HTMLInputElement, options?: DialogShellOptions) {
     this.input = input;
     this.options = options ?? {};
     this.engine = this.options.calendarEngine ?? fatimidAstronomicalCalendar;
+    this.valuePattern = this.options.valuePattern ?? "YYYY-MM-DD";
 
     this.labels = {
       chooseDate: this.options.labels?.chooseDate ?? DEFAULT_LABELS.chooseDate,
@@ -46,9 +50,36 @@ export class DialogShell {
       clear: this.options.labels?.clear ?? DEFAULT_LABELS.clear,
       dialogTitle: this.options.labels?.dialogTitle ?? DEFAULT_LABELS.dialogTitle,
       months: this.options.labels?.months ?? DEFAULT_LABELS.months,
+      invalidDate: this.options.labels?.invalidDate ?? DEFAULT_LABELS.invalidDate,
+      outOfRange: this.options.labels?.outOfRange ?? DEFAULT_LABELS.outOfRange,
     };
 
-    this.visibleDate = this.options.initialDate ?? today(this.engine);
+    // Determine initial date & validity from input.value or options
+    const initialRaw = this.input.value.trim();
+    if (initialRaw) {
+      const parsed = parseValue(initialRaw, this.valuePattern, this.engine, this.labels.months);
+      if (parsed) {
+        if (this.options.minDate && isBefore(parsed, this.options.minDate)) {
+          this.input.setAttribute("aria-invalid", "true");
+          this.input.setCustomValidity(this.labels.outOfRange);
+          this.visibleDate = this.options.initialDate ?? today(this.engine);
+        } else if (this.options.maxDate && isAfter(parsed, this.options.maxDate)) {
+          this.input.setAttribute("aria-invalid", "true");
+          this.input.setCustomValidity(this.labels.outOfRange);
+          this.visibleDate = this.options.initialDate ?? today(this.engine);
+        } else {
+          this.selectedDate = parsed;
+          this.visibleDate = parsed;
+        }
+      } else {
+        this.input.setAttribute("aria-invalid", "true");
+        this.input.setCustomValidity(this.labels.invalidDate);
+        this.visibleDate = this.options.initialDate ?? today(this.engine);
+      }
+    } else {
+      this.selectedDate = this.options.selectedDate;
+      this.visibleDate = this.selectedDate ?? this.options.initialDate ?? today(this.engine);
+    }
 
     const prefix = this.options.idPrefix ?? "tp";
     const uniqueId = nextUniqueId(prefix);
@@ -138,8 +169,6 @@ export class DialogShell {
     gridContainer.className = "tp-grid-container";
     dialog.appendChild(gridContainer);
 
-    this.selectedDate = this.options.selectedDate;
-
     // Month grid with APG keyboard navigation
     this.grid = new MonthGrid({
       calendarEngine: this.engine,
@@ -153,9 +182,7 @@ export class DialogShell {
       labels: this.options.labels,
       labelledBy: titleId,
       onSelect: (date) => {
-        this.selectedDate = date;
-        this.options.onSelect?.(date);
-        this.close();
+        this.selectDate(date);
       },
       onNavigate: (date) => {
         this.setVisibleDate(date, date.day);
@@ -292,6 +319,121 @@ export class DialogShell {
     }
   }
 
+  public selectDate(date: PlainDate): void {
+    if (this.destroyed) {
+      return;
+    }
+    if (this.options.minDate && isBefore(date, this.options.minDate)) {
+      return;
+    }
+    if (this.options.maxDate && isAfter(date, this.options.maxDate)) {
+      return;
+    }
+
+    this.selectedDate = date;
+    this.grid.setSelectedDate(date);
+
+    const formatted = formatValue(date, this.valuePattern, this.labels.months);
+    this.input.value = formatted;
+    this.input.removeAttribute("aria-invalid");
+    this.input.setCustomValidity("");
+
+    this.isProgrammaticChange = true;
+    try {
+      this.input.dispatchEvent(new Event("input", { bubbles: true }));
+      this.input.dispatchEvent(new Event("change", { bubbles: true }));
+      this.input.dispatchEvent(
+        new CustomEvent("taarikh:change", {
+          bubbles: true,
+          detail: { date, value: formatted },
+        }),
+      );
+    } finally {
+      this.isProgrammaticChange = false;
+    }
+
+    this.options.onSelect?.(date);
+    this.close();
+  }
+
+  public clear(): void {
+    if (this.destroyed) {
+      return;
+    }
+    this.selectedDate = undefined;
+    this.grid.setSelectedDate(undefined);
+    this.input.value = "";
+    this.input.removeAttribute("aria-invalid");
+    this.input.setCustomValidity("");
+
+    this.isProgrammaticChange = true;
+    try {
+      this.input.dispatchEvent(new Event("input", { bubbles: true }));
+      this.input.dispatchEvent(new Event("change", { bubbles: true }));
+      this.input.dispatchEvent(
+        new CustomEvent("taarikh:change", {
+          bubbles: true,
+          detail: { date: null, value: "" },
+        }),
+      );
+    } finally {
+      this.isProgrammaticChange = false;
+    }
+
+    this.options.onClear?.();
+  }
+
+  public handleInputChange(): void {
+    if (this.destroyed || this.isProgrammaticChange) {
+      return;
+    }
+    const raw = this.input.value.trim();
+    if (!raw) {
+      this.selectedDate = undefined;
+      this.grid.setSelectedDate(undefined);
+      this.input.removeAttribute("aria-invalid");
+      this.input.setCustomValidity("");
+      this.input.dispatchEvent(
+        new CustomEvent("taarikh:change", {
+          bubbles: true,
+          detail: { date: null, value: "" },
+        }),
+      );
+      return;
+    }
+
+    const parsed = parseValue(raw, this.valuePattern, this.engine, this.labels.months);
+    if (!parsed) {
+      this.input.setAttribute("aria-invalid", "true");
+      this.input.setCustomValidity(this.labels.invalidDate);
+      return;
+    }
+
+    if (this.options.minDate && isBefore(parsed, this.options.minDate)) {
+      this.input.setAttribute("aria-invalid", "true");
+      this.input.setCustomValidity(this.labels.outOfRange);
+      return;
+    }
+
+    if (this.options.maxDate && isAfter(parsed, this.options.maxDate)) {
+      this.input.setAttribute("aria-invalid", "true");
+      this.input.setCustomValidity(this.labels.outOfRange);
+      return;
+    }
+
+    // Valid and within range
+    this.input.removeAttribute("aria-invalid");
+    this.input.setCustomValidity("");
+    this.setSelectedDate(parsed);
+    this.setVisibleDate(parsed, parsed.day);
+    this.input.dispatchEvent(
+      new CustomEvent("taarikh:change", {
+        bubbles: true,
+        detail: { date: parsed, value: this.input.value },
+      }),
+    );
+  }
+
   public [Symbol.dispose](): void {
     this.destroy();
   }
@@ -343,15 +485,42 @@ export class DialogShell {
       { signal },
     );
 
+    // Input change event for typed input
+    this.input.addEventListener(
+      "change",
+      () => {
+        this.handleInputChange();
+      },
+      { signal },
+    );
+
     // Month select change
     selectMonth.addEventListener(
       "change",
       () => {
         const month = parseInt(selectMonth.value, 10);
         if (!Number.isNaN(month)) {
-          const maxDays = this.engine.daysInMonth(this.visibleDate.year, month);
-          const day = Math.min(this.visibleDate.day, maxDays);
-          this.setVisibleDate({ year: this.visibleDate.year, month, day });
+          const year = this.visibleDate.year;
+          let day = this.visibleDate.day;
+          const maxDays = this.engine.daysInMonth(year, month);
+          let minDay = 1;
+          let maxDay = maxDays;
+          if (
+            this.options.minDate &&
+            year === this.options.minDate.year &&
+            month === this.options.minDate.month
+          ) {
+            minDay = this.options.minDate.day;
+          }
+          if (
+            this.options.maxDate &&
+            year === this.options.maxDate.year &&
+            month === this.options.maxDate.month
+          ) {
+            maxDay = this.options.maxDate.day;
+          }
+          day = Math.max(minDay, Math.min(day, maxDay));
+          this.setVisibleDate({ year, month, day }, day);
         }
       },
       { signal },
@@ -363,11 +532,38 @@ export class DialogShell {
       () => {
         const year = parseInt(selectYear.value, 10);
         if (!Number.isNaN(year)) {
-          const maxMonths = this.engine.monthsInYear(year);
-          const month = Math.min(this.visibleDate.month, maxMonths);
+          let month = this.visibleDate.month;
+          const monthsCount = this.engine.monthsInYear(year);
+          let minMonth = 1;
+          let maxMonth = monthsCount;
+          if (this.options.minDate && year === this.options.minDate.year) {
+            minMonth = this.options.minDate.month;
+          }
+          if (this.options.maxDate && year === this.options.maxDate.year) {
+            maxMonth = this.options.maxDate.month;
+          }
+          month = Math.max(minMonth, Math.min(month, maxMonth));
+
+          let day = this.visibleDate.day;
           const maxDays = this.engine.daysInMonth(year, month);
-          const day = Math.min(this.visibleDate.day, maxDays);
-          this.setVisibleDate({ year, month, day });
+          let minDay = 1;
+          let maxDay = maxDays;
+          if (
+            this.options.minDate &&
+            year === this.options.minDate.year &&
+            month === this.options.minDate.month
+          ) {
+            minDay = this.options.minDate.day;
+          }
+          if (
+            this.options.maxDate &&
+            year === this.options.maxDate.year &&
+            month === this.options.maxDate.month
+          ) {
+            maxDay = this.options.maxDate.day;
+          }
+          day = Math.max(minDay, Math.min(day, maxDay));
+          this.setVisibleDate({ year, month, day }, day);
         }
       },
       { signal },
@@ -399,7 +595,7 @@ export class DialogShell {
       () => {
         const todayDate = today(this.engine);
         this.setVisibleDate(todayDate, todayDate.day);
-        this.setSelectedDate(todayDate);
+        this.selectDate(todayDate);
         this.options.onToday?.(todayDate);
       },
       { signal },
@@ -409,9 +605,7 @@ export class DialogShell {
     btnClear.addEventListener(
       "click",
       () => {
-        this.input.value = "";
-        this.setSelectedDate(undefined);
-        this.options.onClear?.();
+        this.clear();
       },
       { signal },
     );
@@ -421,8 +615,15 @@ export class DialogShell {
     const { selectYear } = this.elements;
     selectYear.innerHTML = "";
 
-    const minYear = this.options.minDate?.year ?? Math.min(this.visibleDate.year - 50, 1300);
-    const maxYear = this.options.maxDate?.year ?? Math.max(this.visibleDate.year + 50, 1500);
+    let minYear = this.options.minDate?.year ?? Math.min(this.visibleDate.year - 50, 1300);
+    let maxYear = this.options.maxDate?.year ?? Math.max(this.visibleDate.year + 50, 1500);
+
+    if (this.visibleDate.year < minYear) {
+      minYear = this.options.minDate ? this.options.minDate.year : this.visibleDate.year;
+    }
+    if (this.visibleDate.year > maxYear) {
+      maxYear = this.options.maxDate ? this.options.maxDate.year : this.visibleDate.year;
+    }
 
     for (let y = minYear; y <= maxYear; y += 1) {
       const opt = document.createElement("option");
@@ -437,10 +638,24 @@ export class DialogShell {
     const year = this.visibleDate.year;
     const month = this.visibleDate.month;
 
-    // Update month select options for current year
+    // Check if selectYear has an option for year; if not, regenerate options
+    if (!selectYear.querySelector(`option[value="${year}"]`)) {
+      this.populateYearOptions();
+    }
+
+    // Update month select options bounded by minDate/maxDate for current year
     const monthsCount = this.engine.monthsInYear(year);
+    let minMonth = 1;
+    let maxMonth = monthsCount;
+    if (this.options.minDate && year === this.options.minDate.year) {
+      minMonth = this.options.minDate.month;
+    }
+    if (this.options.maxDate && year === this.options.maxDate.year) {
+      maxMonth = this.options.maxDate.month;
+    }
+
     selectMonth.innerHTML = "";
-    for (let m = 1; m <= monthsCount; m += 1) {
+    for (let m = minMonth; m <= maxMonth; m += 1) {
       const opt = document.createElement("option");
       opt.value = String(m);
       opt.textContent = this.getMonthName(m);
@@ -482,6 +697,18 @@ export class DialogShell {
     } else {
       btnNext.disabled = false;
       btnNext.removeAttribute("aria-disabled");
+    }
+
+    // Update Today button bounded state
+    const todayDate = today(this.engine);
+    const isTodayOutOfRange =
+      (this.options.minDate && isBefore(todayDate, this.options.minDate)) ||
+      (this.options.maxDate && isAfter(todayDate, this.options.maxDate));
+    this.elements.btnToday.disabled = Boolean(isTodayOutOfRange);
+    if (isTodayOutOfRange) {
+      this.elements.btnToday.setAttribute("aria-disabled", "true");
+    } else {
+      this.elements.btnToday.removeAttribute("aria-disabled");
     }
   }
 
