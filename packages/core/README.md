@@ -10,7 +10,7 @@ Pure, headless calendar arithmetic, Fatimid Astronomical Hijri engine, Julian Da
 
 ## Features
 
-- **Zero External Dependencies**: Pure vanilla TypeScript compiled to lightweight, tree-shakeable ESM (`"sideEffects": false`). Under 4 KB uncompressed (~1.2 KB gzipped).
+- **Zero Runtime Dependencies**: Pure vanilla TypeScript compiled to lightweight, tree-shakeable ESM (`"sideEffects": false`). Under 4 KB uncompressed (~1.2 KB gzipped).
 - **Strictly Headless**: Zero DOM or browser dependencies (`window`, `document`, and `HTMLElement` are not used). Runs in Node.js (>= 18), Deno, Bun, Cloudflare Workers, React Native, or browser applications.
 - **Fatimid Astronomical Hijri Engine**: Astronomical calculation based on the Fatimid tabular calendar, with decoupled Julian Day Number (JDN) conversions matching `hussainweb/date-converter`.
 - **Date Arithmetic**: Addition and subtraction across days, months, and leap years (`addDays`, `addMonths`, `addYears`), date comparison (`compareDates`, `isBefore`, `isAfter`, `isSameDay`), and weekday resolution (`weekday`, `weekdayFromJdn`).
@@ -199,7 +199,7 @@ export interface CalendarEngine {
 
 ## Related Packages
 
-- [`@taarikh/picker`](https://www.npmjs.com/package/@taarikh/picker): Accessible, zero-dependency HTML/DOM Hijri date picker component built on `@taarikh/core`.
+- [`@taarikh/picker`](https://www.npmjs.com/package/@taarikh/picker): Accessible HTML/DOM Hijri date picker component with zero third-party dependencies, built on `@taarikh/core`.
 
 ---
 

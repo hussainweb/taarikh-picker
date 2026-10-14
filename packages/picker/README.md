@@ -1,6 +1,6 @@
 # @taarikh/picker
 
-A lightweight, zero-dependency, accessible Hijri calendar date picker built with vanilla TypeScript and modern web standards.
+A lightweight, accessible Hijri calendar date picker with zero third-party dependencies, built with vanilla TypeScript and modern web standards.
 
 [![npm version](https://img.shields.io/npm/v/@taarikh/picker.svg)](https://www.npmjs.com/package/@taarikh/picker)
 [![CI](https://github.com/hussainweb/taarikh-picker/actions/workflows/ci.yml/badge.svg)](https://github.com/hussainweb/taarikh-picker/actions/workflows/ci.yml)
