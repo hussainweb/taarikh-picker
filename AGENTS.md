@@ -45,12 +45,12 @@ For non-skill agents, treat the task map below as the local onboarding source: r
 
 ## Releases & Tagging
 
-Releases are published to **both** npm (`@taarikh/picker`) and Packagist (`hussainweb/taarikh-picker`).
+Releases publish **both** npm packages ([`@taarikh/core`](packages/core) and [`@taarikh/picker`](packages/picker)) and the Packagist library (`hussainweb/taarikh-picker`).
 
 ### Dual Distribution Contract
 
 - On `main`, compiled assets in `dist/` are intentionally gitignored.
-- For Drupal sites installing via Composer / Packagist, the git release tag must contain compiled assets so Drupal can load `libraries/taarikh-picker/dist/index.js` without requiring Node.js or a build step.
+- For Drupal sites installing via Composer / Packagist, the git release tag must contain compiled assets so Drupal can load `libraries/taarikh-picker/dist/index.iife.js` without requiring Node.js or a build step.
 - **Never create or push a release tag directly on `main` without `dist/`**. Always use the automated release workflow.
 
 ### When to Initiate a Release
@@ -82,13 +82,14 @@ Releases are automated through [`.github/workflows/release.yml`](.github/workflo
    _(e.g., `gh workflow run release.yml -f version=0.2.0`)_
 
 3. **What the Workflow Executes Automatically**:
-   - Runs full quality checks (`npm run check`, `npm test`, `npm run typecheck`).
-   - Updates version in `package.json` and compiles fresh `dist/` assets (`npm run build`).
-   - Validates package integrity (`publint`, `attw --pack`, `size-limit`).
-   - Checks out detached HEAD, force-adds `dist/`, and commits the release assets.
+   - Runs full quality checks (`npm run check`, `npm run check:fallow`, `npm test`, `npm run typecheck`).
+   - Updates versions across all workspaces (`npm version <semver> --workspaces`) and synchronizes internal dependency range with `npm pkg set`.
+   - Compiles fresh `dist/` assets across packages and mirrors picker assets into root `dist/` (`npm run build`).
+   - Validates package integrity across workspaces (`npm run verify` running `publint`, `attw --pack`, and `size-limit`).
+   - Checks out detached HEAD, force-adds root `dist/`, and commits the release assets.
    - Creates and pushes git tag `v<version>`.
    - Creates a GitHub Release with auto-generated release notes.
-   - Publishes to npm using OIDC Trusted Publishing with provenance (`--provenance --access public`).
+   - Publishes both `@taarikh/core` and `@taarikh/picker` to npm using OIDC Trusted Publishing with provenance (`--provenance --access public`).
 
 4. **Monitor and Verify**:
    - Watch the workflow run:

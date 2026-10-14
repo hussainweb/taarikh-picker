@@ -826,7 +826,11 @@ const picker = createPicker(input);</code></pre>
     </div>
 
     <script type="module">
-      import { createPicker, today, fatimidAstronomicalCalendar } from "./src/index.ts";
+      import {
+        createPicker,
+        today,
+        fatimidAstronomicalCalendar,
+      } from "./packages/picker/src/index.ts";
 
       const logEl = document.getElementById("event-log");
       function logEvent(source, eventName, detail) {

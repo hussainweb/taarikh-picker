@@ -10,7 +10,8 @@ A lightweight, zero-dependency, accessible Hijri calendar date picker built with
 
 ## Features
 
-- **Zero Runtime Dependencies**: Pure vanilla TypeScript compiled to ESM and IIFE bundles (< 13 KB gzipped including stylesheet). No jQuery, no UI framework dependencies.
+- **Zero External Dependencies**: Pure vanilla TypeScript compiled to ESM and IIFE bundles (< 13 KB gzipped including stylesheet). No jQuery, no third-party runtime dependencies.
+- **Modular Monorepo Architecture**: Includes headless [`@taarikh/core`](#headless-usage-via-taarikhcore) for pure arithmetic, Julian Day conversions, and formatting in Node.js, CLI, or custom components, alongside [`@taarikh/picker`](#via-npm-esm--bundler) for the accessible DOM UI.
 - **Fatimid Astronomical Hijri Calendar**: Accurate astronomical calculation based on the Fatimid tabular calendar, with decoupled Julian Day Number (JDN) conversions matching `hussainweb/date-converter`.
 - **WCAG 2.2 AA Accessible**: Full compliance with the [WAI-ARIA APG Date Picker Dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/examples/datepicker-dialog/), native `<dialog>` top-layer modality, roving `tabindex`, and polite live-region announcements. 0 axe-core violations.
 - **Bidirectional & RTL Layout**: Automatic or manual direction detection (`ltr`, `rtl`, `auto`). Mirrors layout via CSS logical properties, mirrors navigation glyphs (`‹`/`›`), and mirrors keyboard arrow keys.
@@ -23,7 +24,7 @@ A lightweight, zero-dependency, accessible Hijri calendar date picker built with
 
 ## Installation
 
-### Via npm (ESM / Bundler)
+### Via npm (Date Picker UI)
 
 ```bash
 npm install @taarikh/picker
@@ -34,6 +35,34 @@ Import JavaScript and CSS into your project:
 ```ts
 import { createPicker } from "@taarikh/picker";
 import "@taarikh/picker/style.css";
+```
+
+### Headless Usage via `@taarikh/core`
+
+For server-side Node.js, CLI applications, or custom UI components needing only calendar arithmetic without DOM or CSS dependencies:
+
+```bash
+npm install @taarikh/core
+```
+
+```ts
+import {
+  fatimidAstronomicalCalendar,
+  formatDisplay,
+  formatValue,
+  parseValue,
+  today,
+} from "@taarikh/core";
+
+// Today's Hijri date
+const now = today(fatimidAstronomicalCalendar);
+console.log(now); // e.g. { year: 1448, month: 4, day: 22 }
+
+// Format as ISO ASCII value
+console.log(formatValue(now)); // "1448-04-22"
+
+// Format localized display string
+console.log(formatDisplay(now, fatimidAstronomicalCalendar, { locale: "ar" }));
 ```
 
 ### Via Composer (Drupal Library / Packagist)
