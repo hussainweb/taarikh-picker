@@ -336,6 +336,8 @@ describe("TaarikhPicker & createPicker API", () => {
 
     expect(picker instanceof TaarikhPicker).toBe(true);
     expect(picker.isOpen()).toBe(false);
+    expect(picker.getInput()).toBe(input);
+    expect(picker.getDate()).toBeNull();
 
     picker.open();
     expect(picker.isOpen()).toBe(true);
@@ -344,14 +346,44 @@ describe("TaarikhPicker & createPicker API", () => {
     expect(picker.isOpen()).toBe(false);
 
     picker.destroy();
-    expect(picker.getDialogShell()).toBeUndefined();
+    expect(picker.isOpen()).toBe(false);
   });
 
-  it("supports instantiation without input for option holder backwards-compatibility", () => {
-    const picker = new TaarikhPicker({ locale: "ar" });
-    expect(picker.getOptions().locale).toBe("ar");
-    expect(picker.getInput()).toBeUndefined();
-    expect(picker.isOpen()).toBe(false);
+  it("supports getDate() and setDate(date) programmatic API", () => {
+    const picker = createPicker(input);
+    expect(picker.getDate()).toBeNull();
+
+    // Set a date
+    picker.setDate({ year: 1445, month: 9, day: 15 });
+    expect(picker.getDate()).toEqual({ year: 1445, month: 9, day: 15 });
+    expect(input.value).toBe("1445-09-15");
+
+    // Clear date with null
+    picker.setDate(null);
+    expect(picker.getDate()).toBeNull();
+    expect(input.value).toBe("");
+
+    picker.destroy();
+  });
+
+  it("supports dir option and applies dir attribute to dialog", () => {
+    const pickerRtl = createPicker(input, { dir: "rtl" });
+    const elements = pickerRtl.getElements();
+    expect(elements?.dialog.getAttribute("dir")).toBe("rtl");
+    pickerRtl.destroy();
+
+    const inputLtr = document.createElement("input");
+    document.body.appendChild(inputLtr);
+    const pickerLtr = createPicker(inputLtr, { dir: "ltr" });
+    expect(pickerLtr.getElements()?.dialog.getAttribute("dir")).toBeNull();
+    pickerLtr.destroy();
+    inputLtr.remove();
+  });
+
+  it("supports [Symbol.dispose] for using declarations and idempotent destroy", () => {
+    const picker = createPicker(input);
+    expect(() => picker[Symbol.dispose]()).not.toThrow();
+    // Idempotent secondary call
     expect(() => picker.destroy()).not.toThrow();
   });
 });

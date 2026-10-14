@@ -109,6 +109,9 @@ export class DialogShell {
     dialog.setAttribute("aria-labelledby", titleId);
     dialog.setAttribute("closedby", "any");
     dialog.style.setProperty("position-anchor", anchorName);
+    if (this.options.isRtl) {
+      dialog.setAttribute("dir", "rtl");
+    }
 
     // Dialog title (accessible label for aria-labelledby)
     const title = document.createElement("h2");
@@ -293,6 +296,25 @@ export class DialogShell {
     this.options.onMonthChange?.(date);
   }
 
+  public getDate(): PlainDate | null {
+    if (this.destroyed) {
+      return null;
+    }
+    return this.selectedDate ?? null;
+  }
+
+  public setDate(date: PlainDate | null | undefined): void {
+    if (this.destroyed) {
+      return;
+    }
+    if (!date) {
+      this.clear();
+      return;
+    }
+    this.setVisibleDate(date, date.day);
+    this.selectDate(date);
+  }
+
   public destroy(): void {
     if (this.destroyed) {
       return;
@@ -301,7 +323,7 @@ export class DialogShell {
 
     if (this.isOpen()) {
       try {
-        this.close();
+        this.elements.dialog.close();
       } catch {
         // Suppress errors during destroy
       }

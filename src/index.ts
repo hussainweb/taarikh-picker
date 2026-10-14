@@ -1,10 +1,9 @@
 import "./style.css";
 
 import type { CalendarEngine, PlainDate } from "./engine/index.js";
+import { fatimidAstronomicalCalendar } from "./engine/index.js";
 import { DialogShell } from "./ui/dialog.js";
 import type { DialogElements, PickerLabels } from "./ui/types.js";
-
-export const VERSION: string = "0.1.0";
 
 export type { CalendarEngine, MonthLabels, PlainDate } from "./engine/index.js";
 export {
@@ -16,7 +15,6 @@ export {
   addMonths,
   addYears,
   compareDates,
-  fatimidAstronomical,
   fatimidAstronomicalCalendar,
   getMonthName,
   gregorianToJulianDay,
@@ -38,24 +36,26 @@ export {
   parseValue,
 } from "./format/index.js";
 
-export type { DialogElements, DialogShellOptions, PickerLabels } from "./ui/types.js";
-export { DialogShell } from "./ui/dialog.js";
-export { MonthGrid, type MonthGridOptions } from "./ui/grid.js";
+export type { DialogElements, PickerLabels } from "./ui/types.js";
 export { DEFAULT_LABELS } from "./ui/dom.js";
 
 /**
  * Options for configuring TaarikhPicker.
  */
 export interface TaarikhPickerOptions {
-  readonly locale?: string | undefined;
+  readonly engine?: CalendarEngine | undefined;
   readonly labels?: PickerLabels | undefined;
+  readonly firstDayOfWeek?: number | undefined;
   readonly minDate?: PlainDate | undefined;
   readonly maxDate?: PlainDate | undefined;
-  readonly engine?: CalendarEngine | undefined;
+  readonly valueFormat?: string | undefined;
+  /** Alias for valueFormat */
+  readonly valuePattern?: string | undefined;
+  readonly dir?: "ltr" | "rtl" | "auto" | undefined;
+  readonly isRtl?: boolean | undefined;
+  readonly locale?: string | undefined;
   readonly initialDate?: PlainDate | undefined;
   readonly selectedDate?: PlainDate | undefined;
-  readonly firstDayOfWeek?: number | undefined;
-  readonly isRtl?: boolean | undefined;
   readonly idPrefix?: string | undefined;
   readonly onMonthChange?: ((date: PlainDate) => void) | undefined;
   readonly onToday?: ((todayDate: PlainDate) => void) | undefined;
@@ -66,61 +66,90 @@ export interface TaarikhPickerOptions {
 }
 
 /**
+ * Determine the default first day of the week (0 = Sunday .. 6 = Saturday)
+ * using Intl.Locale getWeekInfo when supported, falling back to 0 (Sunday).
+ */
+export function getDefaultFirstDayOfWeek(locale?: string): number {
+  try {
+    const loc = new Intl.Locale(
+      locale || (typeof navigator !== "undefined" ? navigator.language : "en"),
+    );
+    const weekInfo =
+      (loc as unknown as { getWeekInfo?: () => { firstDay?: number } }).getWeekInfo?.() ??
+      (loc as unknown as { weekInfo?: { firstDay?: number } }).weekInfo;
+    if (weekInfo && typeof weekInfo.firstDay === "number") {
+      // ISO firstDay: 1 (Mon) .. 7 (Sun) -> map to 0 (Sun) .. 6 (Sat)
+      return weekInfo.firstDay % 7;
+    }
+  } catch {
+    // Fallback if Intl.Locale or getWeekInfo is unsupported
+  }
+  return 0;
+}
+
+/**
+ * Resolve whether the picker should operate in RTL layout mode.
+ */
+export function resolveIsRtl(
+  input: HTMLElement,
+  dir?: "ltr" | "rtl" | "auto",
+  isRtl?: boolean,
+): boolean {
+  if (dir === "rtl") {
+    return true;
+  }
+  if (dir === "ltr") {
+    return false;
+  }
+  if (isRtl !== undefined) {
+    return isRtl;
+  }
+  if (typeof document !== "undefined") {
+    const closestDir = input.closest?.("[dir]")?.getAttribute("dir");
+    if (closestDir) {
+      return closestDir.toLowerCase() === "rtl";
+    }
+    return document.documentElement.dir === "rtl" || document.dir === "rtl";
+  }
+  return false;
+}
+
+/**
  * Accessible datepicker for Hijri calendars.
  */
 export class TaarikhPicker {
-  public readonly version: string = VERSION;
+  private readonly input: HTMLInputElement;
   private readonly options: TaarikhPickerOptions;
-  private readonly input: HTMLInputElement | undefined;
   private dialogShell: DialogShell | undefined;
 
-  public constructor(
-    inputOrOptions?: HTMLInputElement | TaarikhPickerOptions,
-    options?: TaarikhPickerOptions,
-  ) {
-    if (
-      typeof inputOrOptions === "object" &&
-      inputOrOptions !== null &&
-      "nodeType" in inputOrOptions &&
-      (inputOrOptions as Node).nodeType === 1
-    ) {
-      this.input = inputOrOptions as HTMLInputElement;
-      this.options = options ?? {};
-      this.dialogShell = new DialogShell(this.input, {
-        labels: this.options.labels,
-        minDate: this.options.minDate,
-        maxDate: this.options.maxDate,
-        calendarEngine: this.options.engine,
-        initialDate: this.options.initialDate,
-        selectedDate: this.options.selectedDate,
-        firstDayOfWeek: this.options.firstDayOfWeek,
-        locale: this.options.locale,
-        isRtl: this.options.isRtl,
-        idPrefix: this.options.idPrefix,
-        onMonthChange: this.options.onMonthChange,
-        onToday: this.options.onToday,
-        onClear: this.options.onClear,
-        onOpen: this.options.onOpen,
-        onClose: this.options.onClose,
-        onSelect: this.options.onSelect,
-      });
-    } else {
-      this.input = undefined;
-      this.options = (inputOrOptions as TaarikhPickerOptions) ?? {};
-      this.dialogShell = undefined;
-    }
-  }
+  public constructor(input: HTMLInputElement, options?: TaarikhPickerOptions) {
+    this.input = input;
+    this.options = options ?? {};
 
-  public getOptions(): TaarikhPickerOptions {
-    return this.options;
-  }
+    const firstDayOfWeek =
+      this.options.firstDayOfWeek ?? getDefaultFirstDayOfWeek(this.options.locale);
 
-  public getInput(): HTMLInputElement | undefined {
-    return this.input;
-  }
+    const isRtl = resolveIsRtl(input, this.options.dir, this.options.isRtl);
 
-  public getDialogShell(): DialogShell | undefined {
-    return this.dialogShell;
+    this.dialogShell = new DialogShell(this.input, {
+      labels: this.options.labels,
+      minDate: this.options.minDate,
+      maxDate: this.options.maxDate,
+      calendarEngine: this.options.engine ?? fatimidAstronomicalCalendar,
+      initialDate: this.options.initialDate,
+      selectedDate: this.options.selectedDate,
+      firstDayOfWeek,
+      locale: this.options.locale,
+      isRtl,
+      idPrefix: this.options.idPrefix,
+      valuePattern: this.options.valueFormat ?? this.options.valuePattern,
+      onMonthChange: this.options.onMonthChange,
+      onToday: this.options.onToday,
+      onClear: this.options.onClear,
+      onOpen: this.options.onOpen,
+      onClose: this.options.onClose,
+      onSelect: this.options.onSelect,
+    });
   }
 
   public open(): void {
@@ -133,6 +162,18 @@ export class TaarikhPicker {
 
   public isOpen(): boolean {
     return this.dialogShell?.isOpen() ?? false;
+  }
+
+  public getDate(): PlainDate | null {
+    return this.dialogShell?.getDate() ?? null;
+  }
+
+  public setDate(date: PlainDate | null | undefined): void {
+    this.dialogShell?.setDate(date);
+  }
+
+  public getInput(): HTMLInputElement {
+    return this.input;
   }
 
   public getElements(): DialogElements | undefined {
