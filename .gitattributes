@@ -1,0 +1,26 @@
+# Git export-ignore: Composer archive packaging
+# Packagist zipball contains only dist/, composer.json, LICENSE, and README.md
+
+/.agents export-ignore
+/.beads export-ignore
+/.beads.gate.lock export-ignore
+/.claude export-ignore
+/.codex export-ignore
+/.cursor export-ignore
+/.github export-ignore
+/.playwright-cli export-ignore
+/.vitest export-ignore
+/.attw.json export-ignore
+/.gitattributes export-ignore
+/.gitignore export-ignore
+/AGENTS.md export-ignore
+/CLAUDE.md export-ignore
+/index.html export-ignore
+/package-lock.json export-ignore
+/package.json export-ignore
+/scripts export-ignore
+/src export-ignore
+/test export-ignore
+/tsconfig.json export-ignore
+/tsconfig.test.json export-ignore
+/vite.config.ts export-ignore

@@ -1,0 +1,20 @@
+{
+  "name": "hussainweb/taarikh-picker",
+  "description": "Lightweight, accessible Hijri calendar date picker",
+  "type": "drupal-library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Hussain Abbas",
+      "email": "hussainweb@gmail.com"
+    }
+  ],
+  "homepage": "https://github.com/hussainweb/taarikh-picker",
+  "support": {
+    "issues": "https://github.com/hussainweb/taarikh-picker/issues",
+    "source": "https://github.com/hussainweb/taarikh-picker"
+  },
+  "extra": {
+    "installer-name": "taarikh-picker"
+  }
+}
