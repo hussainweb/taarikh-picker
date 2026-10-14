@@ -1,2 +1,6 @@
 [features]
 hooks = true
+
+[mcp_servers.fallow]
+command = "npx"
+args = ["--no", "fallow-mcp"]
