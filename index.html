@@ -85,21 +85,24 @@
         font-size: 0.95rem;
       }
 
-      .theme-toolbar {
+      .header-actions {
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        flex-wrap: wrap;
       }
 
-      .btn-theme {
+      .btn-theme,
+      .btn-link {
         display: inline-flex;
         align-items: center;
         gap: 0.4rem;
-        padding: 6px 14px;
+        padding: 6px 12px;
         background: var(--bg-panel);
         border: 1px solid var(--border-color);
         border-radius: 8px;
         color: inherit;
+        text-decoration: none;
         cursor: pointer;
         font-size: 0.875rem;
         font-weight: 500;
@@ -108,8 +111,10 @@
           border-color 150ms ease;
       }
 
-      .btn-theme:hover {
+      .btn-theme:hover,
+      .btn-link:hover {
         background: light-dark(#e8eaed, #35363a);
+        text-decoration: none;
       }
 
       .demo-grid {
@@ -281,6 +286,144 @@
         font-size: 0.875rem;
         color: var(--text-color);
       }
+
+      .docs-section {
+        margin-top: 3rem;
+        border-top: 1px solid var(--border-color);
+        padding-top: 2rem;
+      }
+
+      .docs-section h2 {
+        font-size: 1.4rem;
+        margin: 0 0 0.5rem 0;
+      }
+
+      .docs-lead {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        margin: 0 0 1.5rem 0;
+      }
+
+      .docs-card {
+        padding: 1.5rem;
+        background: var(--bg-panel);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+      }
+
+      .docs-card h3 {
+        margin: 0 0 0.75rem 0;
+        font-size: 1.05rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .docs-card p {
+        margin: 0 0 0.75rem 0;
+        font-size: 0.875rem;
+        line-height: 1.6;
+      }
+
+      .docs-card ul {
+        margin: 0 0 0.75rem 0;
+        padding-inline-start: 1.25rem;
+        font-size: 0.875rem;
+        line-height: 1.6;
+      }
+
+      .docs-card li {
+        margin-bottom: 0.35rem;
+      }
+
+      .code-snippet {
+        background: light-dark(#202124, #0d1117);
+        color: #e6edf3;
+        padding: 0.875rem 1rem;
+        border-radius: 8px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 0.8125rem;
+        line-height: 1.5;
+        overflow-x: auto;
+        margin: 0.75rem 0;
+        border: 1px solid var(--border-color);
+      }
+
+      .code-snippet code {
+        font-family: inherit;
+      }
+
+      .docs-table-wrapper {
+        overflow-x: auto;
+        margin: 1rem 0;
+      }
+
+      .docs-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.8125rem;
+      }
+
+      .docs-table th,
+      .docs-table td {
+        border: 1px solid var(--border-color);
+        padding: 8px 10px;
+        text-align: left;
+      }
+
+      .docs-table th {
+        background: var(--bg-card);
+        font-weight: 600;
+      }
+
+      .docs-table td {
+        background: var(--bg-panel);
+      }
+
+      .docs-banner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 1.25rem 1.5rem;
+        background: light-dark(#e8f0fe, #1e293b);
+        border: 1px solid light-dark(#d2e3fc, #334155);
+        border-radius: 10px;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      .docs-banner strong {
+        display: block;
+        font-size: 0.95rem;
+        color: var(--text-color);
+        margin-bottom: 0.25rem;
+      }
+
+      .docs-banner span {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+      }
+
+      .btn-primary-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 8px 16px;
+        background: var(--accent-color);
+        color: #ffffff;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 600;
+        transition: opacity 150ms ease;
+      }
+
+      .btn-primary-link:hover {
+        opacity: 0.9;
+        text-decoration: none;
+      }
     </style>
   </head>
   <body>
@@ -295,7 +438,23 @@
             Accessible, zero-dependency Fatimid Hijri calendar datepicker component
           </p>
         </div>
-        <div class="theme-toolbar">
+        <div class="header-actions">
+          <a href="#usage" class="btn-link">
+            <span>📖 Usage Guide</span>
+          </a>
+          <a
+            href="https://github.com/hussainweb/taarikh-picker"
+            class="btn-link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+              <path
+                d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+              />
+            </svg>
+            <span>GitHub</span>
+          </a>
           <button type="button" id="btn-theme-toggle" class="btn-theme" title="Toggle color scheme">
             <span id="theme-icon" aria-hidden="true">🌓</span>
             <span id="theme-label">Theme: Auto</span>
@@ -421,6 +580,213 @@
           <div class="log-line">
             <span class="log-time">[Init]</span> Interactive demo initialized with TaarikhPicker.
           </div>
+        </div>
+      </section>
+
+      <!-- Section 5: Usage & Integration Guide -->
+      <section class="docs-section" id="usage">
+        <h2>Usage &amp; Integration Guide</h2>
+        <p class="docs-lead">
+          Everything you need to integrate the Taarikh Hijri Datepicker into your web application or
+          form.
+        </p>
+
+        <!-- Subsection 1: Required HTML Structure -->
+        <article class="docs-card">
+          <h3>1. Required HTML Structure</h3>
+          <p>
+            The picker requires only a standard HTML <code>&lt;input&gt;</code> element with an
+            accessible label. You do <strong>not</strong> need to write any
+            <code>&lt;dialog&gt;</code>, button, or calendar table markup manually.
+          </p>
+          <pre class="code-snippet"><code>&lt;!-- Minimum Required HTML --&gt;
+&lt;label for="hijri-date"&gt;Hijri Date&lt;/label&gt;
+&lt;input type="text" id="hijri-date" name="hijri_date" placeholder="YYYY-MM-DD" autocomplete="off" /&gt;</code></pre>
+          <ul>
+            <li>
+              <strong>Input Type:</strong> Use <code>type="text"</code>. Standard
+              <code>type="date"</code> inputs enforce Gregorian calendar dates and trigger
+              browser-native pickers.
+            </li>
+            <li>
+              <strong>Accessible Labeling:</strong> Always pair the input with a
+              <code>&lt;label for="..."&gt;</code> or specify <code>aria-label</code> /
+              <code>aria-labelledby</code> for WCAG 2.2 AA compliance.
+            </li>
+            <li>
+              <strong>Automatic DOM Injection:</strong> The calendar trigger button
+              (<code>.tp-btn-trigger</code>) and modal (<code>.tp-dialog</code>) are automatically
+              generated and inserted as adjacent siblings (<code>input.after(trigger, dialog)</code
+              >).
+            </li>
+            <li>
+              <strong>Text Direction (RTL):</strong> Add <code>dir="rtl"</code>,
+              <code>dir="ltr"</code>, or <code>dir="auto"</code> to the input or any ancestor
+              container (e.g. <code>&lt;form dir="rtl"&gt;</code>). The picker automatically detects
+              direction to mirror navigation glyphs and keyboard arrows.
+            </li>
+            <li>
+              <strong>Pre-filled Values:</strong> An optional <code>value="YYYY-MM-DD"</code> (ASCII
+              numerals, e.g. <code>value="1446-09-01"</code>) will be parsed and selected
+              automatically on initialization.
+            </li>
+          </ul>
+        </article>
+
+        <!-- Subsection 2: Installation -->
+        <article class="docs-card">
+          <h3>2. Installation Options</h3>
+          <p>Install via your package manager or directly via script tag:</p>
+
+          <p><strong>npm (ESM / Bundler):</strong></p>
+          <pre class="code-snippet"><code>npm install @taarikh/picker</code></pre>
+          <pre class="code-snippet"><code>import { createPicker } from "@taarikh/picker";
+import "@taarikh/picker/style.css";
+
+const input = document.querySelector("#hijri-date");
+const picker = createPicker(input);</code></pre>
+
+          <p><strong>Composer (Drupal Library / Packagist):</strong></p>
+          <pre class="code-snippet"><code>composer require hussainweb/taarikh-picker</code></pre>
+
+          <p><strong>Standalone IIFE (Direct &lt;script&gt; Tag):</strong></p>
+          <pre class="code-snippet"><code>&lt;!-- Stylesheet --&gt;
+&lt;link rel="stylesheet" href="/libraries/taarikh-picker/dist/style.css" /&gt;
+
+&lt;!-- Input --&gt;
+&lt;label for="hijri-date"&gt;Hijri Date&lt;/label&gt;
+&lt;input type="text" id="hijri-date" name="hijri_date" placeholder="YYYY-MM-DD" /&gt;
+
+&lt;!-- Standalone IIFE Script --&gt;
+&lt;script src="/libraries/taarikh-picker/dist/index.iife.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  const input = document.getElementById("hijri-date");
+  const picker = TaarikhPicker.createPicker(input);
+&lt;/script&gt;</code></pre>
+        </article>
+
+        <!-- Subsection 3: Configuration Options -->
+        <article class="docs-card">
+          <h3>3. Key Configuration Options</h3>
+          <p>Pass an optional options object to <code>createPicker(input, options)</code>:</p>
+          <div class="docs-table-wrapper">
+            <table class="docs-table">
+              <thead>
+                <tr>
+                  <th>Option</th>
+                  <th>Type</th>
+                  <th>Default</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>locale</code></td>
+                  <td><code>string</code></td>
+                  <td>Browser default</td>
+                  <td>
+                    BCP 47 language tag (e.g. <code>'ar'</code>, <code>'fa'</code>,
+                    <code>'en'</code>).
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>dir</code></td>
+                  <td><code>'ltr' | 'rtl' | 'auto'</code></td>
+                  <td><code>'auto'</code></td>
+                  <td>
+                    Text direction. Automatically detects from ancestor <code>[dir]</code> or
+                    computed style.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>minDate</code></td>
+                  <td><code>PlainDate</code></td>
+                  <td><code>undefined</code></td>
+                  <td>
+                    Earliest selectable date: <code>{ year, month, day }</code>. Earlier dates are
+                    disabled.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>maxDate</code></td>
+                  <td><code>PlainDate</code></td>
+                  <td><code>undefined</code></td>
+                  <td>
+                    Latest selectable date: <code>{ year, month, day }</code>. Later dates are
+                    disabled.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>initialDate</code></td>
+                  <td><code>PlainDate</code></td>
+                  <td>Today</td>
+                  <td>Default visible month and focused date when the input is empty.</td>
+                </tr>
+                <tr>
+                  <td><code>valueFormat</code></td>
+                  <td><code>string</code></td>
+                  <td><code>'YYYY-MM-DD'</code></td>
+                  <td>Date format pattern for submitted input value.</td>
+                </tr>
+                <tr>
+                  <td><code>labels</code></td>
+                  <td><code>PickerLabels</code></td>
+                  <td>English/Fatimid</td>
+                  <td>
+                    Custom string overrides for buttons, header selects, dialog title, and live
+                    regions.
+                  </td>
+                </tr>
+                <tr>
+                  <td><code>onSelect</code></td>
+                  <td><code>(date: PlainDate) =&gt; void</code></td>
+                  <td><code>undefined</code></td>
+                  <td>Callback fired when a date is selected.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <!-- Subsection 4: Events & Value Contract -->
+        <article class="docs-card">
+          <h3>4. Events &amp; Form Value Contract</h3>
+          <p>
+            When a date is chosen, the picker dispatches native <code>input</code>, native
+            <code>change</code>, and a custom <code>taarikh:change</code> event:
+          </p>
+          <pre class="code-snippet"><code>input.addEventListener("taarikh:change", (event) =&gt; {
+  const { date, value } = event.detail;
+  // date: { year: 1446, month: 9, day: 1 } or null
+  // value: "1446-09-01" or ""
+  console.log("Selected Hijri Date:", date);
+  console.log("Submitted ASCII value:", value);
+});</code></pre>
+          <p>
+            <strong>Value Contract:</strong> Submitted form values are strictly zero-padded ASCII
+            <code>YYYY-MM-DD</code> strings suitable for backend validation. Localized digits,
+            script separators, and month names are used strictly for UI presentation.
+          </p>
+        </article>
+
+        <!-- Documentation Banner -->
+        <div class="docs-banner">
+          <div>
+            <strong>Looking for the full API reference or CSS design tokens?</strong>
+            <span
+              >Detailed docs for instance methods (<code>open()</code>, <code>close()</code>,
+              <code>destroy()</code>, <code>using</code>), <code>--tp-*</code> custom properties,
+              and migration from <code>jquery.calendars</code>.</span
+            >
+          </div>
+          <a
+            href="https://github.com/hussainweb/taarikh-picker#readme"
+            class="btn-primary-link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Read Full Documentation on GitHub &rarr;
+          </a>
         </div>
       </section>
 
