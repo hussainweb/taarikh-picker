@@ -1,6 +1,18 @@
 import type { MonthLabels } from "../engine/index.js";
 
 /**
+ * Custom weekday labels dictionary.
+ * Array of 7 weekday names starting with Sunday (0 = Sunday .. 6 = Saturday).
+ */
+export interface WeekdayLabels {
+  readonly long?: readonly string[] | undefined;
+  readonly short?: readonly string[] | undefined;
+  readonly narrow?: readonly string[] | undefined;
+  /** Alias for narrow */
+  readonly min?: readonly string[] | undefined;
+}
+
+/**
  * Options for localized calendar display formatting.
  */
 export interface DisplayOptions {
@@ -17,10 +29,10 @@ export interface DisplayOptions {
   readonly month?: "long" | "short" | undefined;
 
   /**
-   * Weekday display format: 'long' (e.g. 'Friday'), 'short' (e.g. 'Fri'), or 'narrow' (e.g. 'F').
+   * Weekday display format: 'long' (e.g. 'Friday'), 'short' (e.g. 'Fri'), 'narrow' (e.g. 'F'), or 'min'.
    * If omitted or undefined, weekday is not included in the formatted string.
    */
-  readonly weekday?: "long" | "short" | "narrow" | undefined;
+  readonly weekday?: "long" | "short" | "narrow" | "min" | undefined;
 
   /**
    * Year display format: 'numeric' (e.g. '1445'), '2-digit' (e.g. '45'), or false to omit.
@@ -38,4 +50,22 @@ export interface DisplayOptions {
    * Custom labels dictionary (overrides default transliterated month names).
    */
   readonly labels?: MonthLabels | undefined;
+
+  /**
+   * Custom weekday names (overrides Intl weekday names).
+   */
+  readonly weekdays?: WeekdayLabels | readonly string[] | undefined;
+
+  /**
+   * Ordering of date components: 'dmy', 'mdy', or 'ymd'.
+   * Defaults to 'dmy' for English/fallback, or inferred from locale.
+   */
+  readonly order?: "dmy" | "mdy" | "ymd" | undefined;
+
+  /**
+   * Custom separator between weekday and date part (e.g. ", " or "، ").
+   * If omitted, automatically uses Arabic comma ("، ") for Arabic-script locales (ar, fa, ur)
+   * and standard comma (", ") otherwise.
+   */
+  readonly separator?: string | undefined;
 }

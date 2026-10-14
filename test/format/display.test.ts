@@ -141,3 +141,123 @@ describe("formatDayAriaLabel and formatMonthHeading", () => {
     );
   });
 });
+
+describe("2026-10-11 review improvements - separators, caching, order, and custom weekdays", () => {
+  const sampleDate = { year: 1445, month: 9, day: 1 };
+
+  it("caches Intl formatters across multiple calls", async () => {
+    const { clearFormatterCache, getDateTimeFormatter, getNumberFormatter } =
+      await import("../../src/format/index.js");
+
+    clearFormatterCache();
+
+    const dtf1 = getDateTimeFormatter("en", { weekday: "long", timeZone: "UTC" });
+    const dtf2 = getDateTimeFormatter("en", { weekday: "long", timeZone: "UTC" });
+    expect(dtf1).toBe(dtf2); // Exactly same instance from cache
+
+    const nf1 = getNumberFormatter("ar-EG", { useGrouping: false });
+    const nf2 = getNumberFormatter("ar-EG", { useGrouping: false });
+    expect(nf1).toBe(nf2); // Exactly same instance from cache
+  });
+
+  it("uses Arabic comma for Arabic-script locales (ar, fa, ur) and standard comma for arn and en", async () => {
+    const { isArabicScriptLocale } = await import("../../src/format/index.js");
+
+    expect(isArabicScriptLocale("ar")).toBe(true);
+    expect(isArabicScriptLocale("ar-SA")).toBe(true);
+    expect(isArabicScriptLocale("fa")).toBe(true);
+    expect(isArabicScriptLocale("fa-IR")).toBe(true);
+    expect(isArabicScriptLocale("ur")).toBe(true);
+    expect(isArabicScriptLocale("ur-PK")).toBe(true);
+
+    // Mapudungun (arn) starts with 'ar' but is NOT Arabic
+    expect(isArabicScriptLocale("arn")).toBe(false);
+    expect(isArabicScriptLocale("en")).toBe(false);
+    expect(isArabicScriptLocale("de")).toBe(false);
+
+    // Formatted display separator check
+    const arFormatted = formatDisplay(sampleDate, fatimidAstronomicalCalendar, {
+      locale: "ar",
+      weekday: "long",
+    });
+    expect(arFormatted).toContain("، ");
+
+    const faFormatted = formatDisplay(sampleDate, fatimidAstronomicalCalendar, {
+      locale: "fa",
+      weekday: "long",
+    });
+    expect(faFormatted).toContain("، ");
+
+    const urFormatted = formatDisplay(sampleDate, fatimidAstronomicalCalendar, {
+      locale: "ur",
+      weekday: "long",
+    });
+    expect(urFormatted).toContain("، ");
+
+    const arnFormatted = formatDisplay(sampleDate, fatimidAstronomicalCalendar, {
+      locale: "arn",
+      weekday: "long",
+    });
+    expect(arnFormatted).not.toContain("، ");
+    expect(arnFormatted).toContain(", ");
+
+    // Custom separator override
+    const customSep = formatDisplay(sampleDate, fatimidAstronomicalCalendar, {
+      weekday: "long",
+      separator: " — ",
+    });
+    expect(customSep).toContain(" — ");
+  });
+
+  it("supports non-hardcoded date ordering: dmy, mdy, ymd", () => {
+    // dmy
+    const dmy = formatDisplay(sampleDate, fatimidAstronomicalCalendar, {
+      order: "dmy",
+    });
+    expect(dmy).toBe("1 Ramadan al-Moazzam 1445");
+
+    // mdy
+    const mdy = formatDisplay(sampleDate, fatimidAstronomicalCalendar, {
+      order: "mdy",
+    });
+    expect(mdy).toBe("Ramadan al-Moazzam 1 1445");
+
+    // ymd
+    const ymd = formatDisplay(sampleDate, fatimidAstronomicalCalendar, {
+      order: "ymd",
+    });
+    expect(ymd).toBe("1445 Ramadan al-Moazzam 1");
+  });
+
+  it("supports custom weekday names in getWeekdayNames and formatDisplay", () => {
+    const customWeekdays = {
+      long: ["Ahad", "Ithnayn", "Thulatha", "Arba'a", "Khamis", "Jum'ah", "Sabt"],
+      short: ["Ahd", "Ith", "Thu", "Arb", "Kha", "Jum", "Sab"],
+      narrow: ["A", "I", "T", "R", "K", "J", "S"],
+      min: ["A", "I", "T", "R", "K", "J", "S"],
+    };
+
+    const names = getWeekdayNames("en", "long", 0, customWeekdays);
+    expect(names[0]).toBe("Ahad");
+    expect(names[5]).toBe("Jum'ah");
+
+    // With firstDay = 1 (Monday)
+    const mondayFirst = getWeekdayNames("en", "short", 1, customWeekdays);
+    expect(mondayFirst[0]).toBe("Ith");
+    expect(mondayFirst[6]).toBe("Ahd");
+
+    // In formatDisplay
+    const formatted = formatDisplay(sampleDate, fatimidAstronomicalCalendar, {
+      weekday: "long",
+      weekdays: customWeekdays,
+    });
+    const w = weekday(sampleDate, fatimidAstronomicalCalendar);
+    expect(formatted).toContain(customWeekdays.long[w]);
+  });
+
+  it("formats year with formatYear using localized numerals", async () => {
+    const { formatYear } = await import("../../src/format/index.js");
+    expect(formatYear(1445, "en")).toBe("1445");
+    expect(formatYear(1445, "ar-EG")).toBe("١٤٤٥");
+  });
+});

@@ -26,17 +26,23 @@ export {
   weekdayFromJdn,
 } from "./engine/index.js";
 
-export type { DisplayOptions } from "./format/index.js";
+export type { DisplayOptions, WeekdayLabels } from "./format/index.js";
 export {
+  clearFormatterCache,
   formatDayAriaLabel,
   formatDisplay,
   formatMonthHeading,
   formatValue,
+  formatYear,
+  getDateTimeFormatter,
+  getNumberFormatter,
   getWeekdayNames,
+  inferDateOrder,
+  isArabicScriptLocale,
   parseValue,
 } from "./format/index.js";
 
-export type { DialogElements, PickerLabels } from "./ui/types.js";
+export type { DialogElements, PickerLabels, ResolvedPickerLabels } from "./ui/types.js";
 export { DEFAULT_LABELS } from "./ui/dom.js";
 
 /**
@@ -101,15 +107,45 @@ export function resolveIsRtl(
   if (dir === "ltr") {
     return false;
   }
-  if (isRtl !== undefined) {
+  if (dir === undefined && isRtl !== undefined) {
     return isRtl;
   }
   if (typeof document !== "undefined") {
     const closestDir = input.closest?.("[dir]")?.getAttribute("dir");
     if (closestDir) {
-      return closestDir.toLowerCase() === "rtl";
+      const lower = closestDir.toLowerCase();
+      if (lower === "rtl") {
+        return true;
+      }
+      if (lower === "ltr") {
+        return false;
+      }
     }
-    return document.documentElement.dir === "rtl" || document.dir === "rtl";
+    if (typeof window !== "undefined" && typeof window.getComputedStyle === "function") {
+      try {
+        const computed = window.getComputedStyle(input).direction;
+        if (computed === "rtl") {
+          return true;
+        }
+        if (computed === "ltr") {
+          return false;
+        }
+      } catch {
+        // Fallback
+      }
+    }
+    if (document.documentElement?.dir) {
+      return document.documentElement.dir.toLowerCase() === "rtl";
+    }
+    if (document.body?.dir) {
+      return document.body.dir.toLowerCase() === "rtl";
+    }
+    if (document.dir) {
+      return document.dir.toLowerCase() === "rtl";
+    }
+  }
+  if (isRtl !== undefined) {
+    return isRtl;
   }
   return false;
 }

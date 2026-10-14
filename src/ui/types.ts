@@ -1,21 +1,29 @@
 import type { CalendarEngine, PlainDate } from "../engine/types.js";
 import type { MonthLabels } from "../engine/labels.js";
+import type { WeekdayLabels } from "../format/types.js";
 
 /**
  * Localisable labels for the datepicker dialog shell and controls.
  */
 export interface PickerLabels {
   readonly chooseDate?: string | undefined;
+  readonly trigger?: string | undefined;
+  readonly open?: string | undefined;
   readonly previousMonth?: string | undefined;
+  readonly prev?: string | undefined;
   readonly nextMonth?: string | undefined;
+  readonly next?: string | undefined;
   readonly monthSelect?: string | undefined;
   readonly yearSelect?: string | undefined;
   readonly today?: string | undefined;
   readonly clear?: string | undefined;
+  readonly close?: string | undefined;
   readonly dialogTitle?: string | undefined;
   readonly months?: MonthLabels | undefined;
+  readonly weekdays?: WeekdayLabels | readonly string[] | undefined;
   readonly invalidDate?: string | undefined;
   readonly outOfRange?: string | undefined;
+  readonly liveRegion?: ((monthName: string, year: string) => string) | string | undefined;
 }
 
 /**
@@ -24,15 +32,20 @@ export interface PickerLabels {
 export interface ResolvedPickerLabels {
   readonly chooseDate: string;
   readonly previousMonth: string;
+  readonly prev: string;
   readonly nextMonth: string;
+  readonly next: string;
   readonly monthSelect: string;
   readonly yearSelect: string;
   readonly today: string;
   readonly clear: string;
+  readonly close: string;
   readonly dialogTitle: string;
   readonly months: MonthLabels;
+  readonly weekdays?: WeekdayLabels | readonly string[] | undefined;
   readonly invalidDate: string;
   readonly outOfRange: string;
+  readonly liveRegion?: ((monthName: string, year: string) => string) | string | undefined;
 }
 
 /**
@@ -52,6 +65,7 @@ export interface DialogElements {
   readonly footer: HTMLElement;
   readonly btnToday: HTMLButtonElement;
   readonly btnClear: HTMLButtonElement;
+  readonly btnClose?: HTMLButtonElement | undefined;
   readonly grid?: HTMLTableElement | undefined;
 }
 
@@ -68,6 +82,7 @@ export interface DialogShellOptions {
   readonly selectedDate?: PlainDate | undefined;
   readonly firstDayOfWeek?: number | undefined;
   readonly locale?: string | undefined;
+  readonly dir?: "ltr" | "rtl" | "auto" | undefined;
   readonly isRtl?: boolean | undefined;
   readonly valuePattern?: string | undefined;
   readonly onMonthChange?: ((date: PlainDate) => void) | undefined;

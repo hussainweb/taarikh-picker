@@ -200,8 +200,18 @@ export class MonthGrid {
     row.className = "tp-grid-head-row";
     row.setAttribute("role", "row");
 
-    const shortNames = getWeekdayNames(this.options.locale, "short", this.firstDayOfWeek);
-    const longNames = getWeekdayNames(this.options.locale, "long", this.firstDayOfWeek);
+    const shortNames = getWeekdayNames(
+      this.options.locale,
+      "short",
+      this.firstDayOfWeek,
+      this.options.labels?.weekdays,
+    );
+    const longNames = getWeekdayNames(
+      this.options.locale,
+      "long",
+      this.firstDayOfWeek,
+      this.options.labels?.weekdays,
+    );
 
     for (let i = 0; i < 7; i++) {
       const th = document.createElement("th");
@@ -230,7 +240,7 @@ export class MonthGrid {
 
     // Day of the week for day 1
     const firstDayWeekday = weekday({ year, month, day: 1 }, this.engine);
-    const leadingEmptyCells = (firstDayWeekday - this.firstDayOfWeek + 7) % 7;
+    const leadingEmptyCells = (((firstDayWeekday - this.firstDayOfWeek) % 7) + 7) % 7;
 
     let currentRow = document.createElement("tr");
     currentRow.className = "tp-grid-row";
@@ -272,6 +282,7 @@ export class MonthGrid {
         this.engine,
         this.options.locale,
         this.options.labels?.months,
+        this.options.labels?.weekdays,
       );
       btn.setAttribute("aria-label", ariaLabel);
 

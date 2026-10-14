@@ -2,6 +2,7 @@ import type { CalendarEngine, PlainDate } from "../engine/types.js";
 import { fatimidAstronomicalCalendar } from "../engine/fatimid.js";
 import { addMonths, isAfter, isBefore, today } from "../engine/helpers.js";
 import { getMonthName } from "../engine/labels.js";
+import { formatMonthHeading, formatYear } from "../format/index.js";
 import { formatValue, parseValue } from "../format/value.js";
 import { CALENDAR_SVG_ICON, DEFAULT_LABELS, nextUniqueId } from "./dom.js";
 import { MonthGrid } from "./grid.js";
@@ -40,18 +41,35 @@ export class DialogShell {
     this.engine = this.options.calendarEngine ?? fatimidAstronomicalCalendar;
     this.valuePattern = this.options.valuePattern ?? "YYYY-MM-DD";
 
+    const isRtl =
+      this.options.isRtl ??
+      (this.options.dir === "rtl" ? true : this.options.dir === "ltr" ? false : false);
+
     this.labels = {
-      chooseDate: this.options.labels?.chooseDate ?? DEFAULT_LABELS.chooseDate,
-      previousMonth: this.options.labels?.previousMonth ?? DEFAULT_LABELS.previousMonth,
-      nextMonth: this.options.labels?.nextMonth ?? DEFAULT_LABELS.nextMonth,
+      chooseDate:
+        this.options.labels?.chooseDate ??
+        this.options.labels?.trigger ??
+        this.options.labels?.open ??
+        DEFAULT_LABELS.chooseDate,
+      previousMonth:
+        this.options.labels?.previousMonth ??
+        this.options.labels?.prev ??
+        DEFAULT_LABELS.previousMonth,
+      prev: this.options.labels?.prev ?? (isRtl ? "›" : DEFAULT_LABELS.prev),
+      nextMonth:
+        this.options.labels?.nextMonth ?? this.options.labels?.next ?? DEFAULT_LABELS.nextMonth,
+      next: this.options.labels?.next ?? (isRtl ? "‹" : DEFAULT_LABELS.next),
       monthSelect: this.options.labels?.monthSelect ?? DEFAULT_LABELS.monthSelect,
       yearSelect: this.options.labels?.yearSelect ?? DEFAULT_LABELS.yearSelect,
       today: this.options.labels?.today ?? DEFAULT_LABELS.today,
       clear: this.options.labels?.clear ?? DEFAULT_LABELS.clear,
+      close: this.options.labels?.close ?? DEFAULT_LABELS.close,
       dialogTitle: this.options.labels?.dialogTitle ?? DEFAULT_LABELS.dialogTitle,
       months: this.options.labels?.months ?? DEFAULT_LABELS.months,
+      weekdays: this.options.labels?.weekdays,
       invalidDate: this.options.labels?.invalidDate ?? DEFAULT_LABELS.invalidDate,
       outOfRange: this.options.labels?.outOfRange ?? DEFAULT_LABELS.outOfRange,
+      liveRegion: this.options.labels?.liveRegion,
     };
 
     // Determine initial date & validity from input.value or options
@@ -109,7 +127,7 @@ export class DialogShell {
     dialog.setAttribute("aria-labelledby", titleId);
     dialog.setAttribute("closedby", "any");
     dialog.style.setProperty("position-anchor", anchorName);
-    if (this.options.isRtl) {
+    if (isRtl) {
       dialog.setAttribute("dir", "rtl");
     }
 
@@ -131,7 +149,7 @@ export class DialogShell {
     btnPrev.type = "button";
     btnPrev.className = "tp-btn-prev";
     btnPrev.setAttribute("aria-label", this.labels.previousMonth);
-    btnPrev.textContent = "‹";
+    btnPrev.textContent = this.labels.prev;
 
     const selectors = document.createElement("div");
     selectors.className = "tp-header-selectors";
@@ -151,7 +169,7 @@ export class DialogShell {
     btnNext.type = "button";
     btnNext.className = "tp-btn-next";
     btnNext.setAttribute("aria-label", this.labels.nextMonth);
-    btnNext.textContent = "›";
+    btnNext.textContent = this.labels.next;
 
     nav.appendChild(btnPrev);
     nav.appendChild(selectors);
@@ -181,8 +199,8 @@ export class DialogShell {
       maxDate: this.options.maxDate,
       locale: this.options.locale,
       firstDayOfWeek: this.options.firstDayOfWeek,
-      isRtl: this.options.isRtl,
-      labels: this.options.labels,
+      isRtl,
+      labels: this.labels,
       labelledBy: titleId,
       onSelect: (date) => {
         this.selectDate(date);
@@ -650,7 +668,7 @@ export class DialogShell {
     for (let y = minYear; y <= maxYear; y += 1) {
       const opt = document.createElement("option");
       opt.value = String(y);
-      opt.textContent = String(y);
+      opt.textContent = formatYear(y, this.options.locale);
       selectYear.appendChild(opt);
     }
   }
@@ -688,7 +706,20 @@ export class DialogShell {
 
     // Announce visible month & year via polite live region
     const monthName = this.getMonthName(month);
-    liveRegion.textContent = `${monthName} ${year}`;
+    const yearDisplay = formatYear(year, this.options.locale);
+
+    if (typeof this.labels.liveRegion === "function") {
+      liveRegion.textContent = this.labels.liveRegion(monthName, yearDisplay);
+    } else if (typeof this.labels.liveRegion === "string") {
+      liveRegion.textContent = this.labels.liveRegion
+        .replace("{month}", monthName)
+        .replace("{year}", yearDisplay);
+    } else {
+      liveRegion.textContent = formatMonthHeading(this.visibleDate, this.engine, {
+        locale: this.options.locale,
+        labels: this.labels.months,
+      });
+    }
 
     // Update bounded navigation buttons
     if (this.options.minDate) {

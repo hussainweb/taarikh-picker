@@ -386,4 +386,105 @@ describe("TaarikhPicker & createPicker API", () => {
     // Idempotent secondary call
     expect(() => picker.destroy()).not.toThrow();
   });
+
+  it("detects dir from element or ancestor and mirrors prev/next glyphs in RTL", () => {
+    // 1. Ancestor with dir="rtl"
+    const wrapper = document.createElement("div");
+    wrapper.setAttribute("dir", "rtl");
+    document.body.appendChild(wrapper);
+    const rtlInput = document.createElement("input");
+    wrapper.appendChild(rtlInput);
+
+    const picker = createPicker(rtlInput);
+    const elements = picker.getElements()!;
+    expect(elements.dialog.getAttribute("dir")).toBe("rtl");
+    // Mirrored glyphs in RTL: prev points right (›), next points left (‹)
+    expect(elements.btnPrev.textContent).toBe("›");
+    expect(elements.btnNext.textContent).toBe("‹");
+
+    picker.destroy();
+    wrapper.remove();
+
+    // 2. Element itself with dir="rtl"
+    const selfRtlInput = document.createElement("input");
+    selfRtlInput.setAttribute("dir", "rtl");
+    document.body.appendChild(selfRtlInput);
+
+    const picker2 = createPicker(selfRtlInput);
+    const elements2 = picker2.getElements()!;
+    expect(elements2.dialog.getAttribute("dir")).toBe("rtl");
+    expect(elements2.btnPrev.textContent).toBe("›");
+    expect(elements2.btnNext.textContent).toBe("‹");
+
+    picker2.destroy();
+    selfRtlInput.remove();
+
+    // 3. Overriding dir option with 'ltr' cancels RTL
+    const ltrOverrideInput = document.createElement("input");
+    ltrOverrideInput.setAttribute("dir", "rtl");
+    document.body.appendChild(ltrOverrideInput);
+
+    const picker3 = createPicker(ltrOverrideInput, { dir: "ltr" });
+    expect(picker3.getElements()?.dialog.getAttribute("dir")).toBeNull();
+    expect(picker3.getElements()?.btnPrev.textContent).toBe("‹");
+    expect(picker3.getElements()?.btnNext.textContent).toBe("›");
+
+    picker3.destroy();
+    ltrOverrideInput.remove();
+  });
+
+  it("customizes every button label and aria label via labels option", () => {
+    const picker = createPicker(input, {
+      labels: {
+        trigger: "Ouvrir le calendrier",
+        prev: "Préc",
+        previousMonth: "Mois précédent",
+        next: "Suiv",
+        nextMonth: "Mois suivant",
+        today: "Aujourd'hui",
+        clear: "Effacer",
+        close: "Fermer",
+        monthSelect: "Sélectionner le mois",
+        yearSelect: "Sélectionner l'année",
+        dialogTitle: "Choisir une date",
+        liveRegion: (month, year) => `Affichage: ${month} ${year}`,
+      },
+    });
+
+    const elements = picker.getElements()!;
+
+    expect(elements.trigger.getAttribute("aria-label")).toBe("Ouvrir le calendrier");
+    expect(elements.trigger.title).toBe("Ouvrir le calendrier");
+    expect(elements.btnPrev.textContent).toBe("Préc");
+    expect(elements.btnPrev.getAttribute("aria-label")).toBe("Mois précédent");
+    expect(elements.btnNext.textContent).toBe("Suiv");
+    expect(elements.btnNext.getAttribute("aria-label")).toBe("Mois suivant");
+    expect(elements.btnToday.textContent).toBe("Aujourd'hui");
+    expect(elements.btnClear.textContent).toBe("Effacer");
+    expect(elements.selectMonth.getAttribute("aria-label")).toBe("Sélectionner le mois");
+    expect(elements.selectYear.getAttribute("aria-label")).toBe("Sélectionner l'année");
+    expect(elements.title.textContent).toBe("Choisir une date");
+    expect(elements.liveRegion.textContent).toContain("Affichage:");
+
+    picker.destroy();
+  });
+
+  it("localizes year select options and live region with Arabic numerals when locale is ar-EG", () => {
+    const picker = createPicker(input, {
+      locale: "ar-EG",
+      initialDate: { year: 1445, month: 9, day: 1 },
+    });
+    const elements = picker.getElements()!;
+
+    // Year select text is localized to Eastern Arabic numerals, but value remains ASCII!
+    const yearOption = elements.selectYear.querySelector('option[value="1445"]');
+    expect(yearOption).not.toBeNull();
+    expect(yearOption?.textContent).toBe("١٤٤٥");
+    expect(yearOption?.getAttribute("value")).toBe("1445");
+
+    // Live region uses localized year
+    expect(elements.liveRegion.textContent).toContain("١٤٤٥");
+
+    picker.destroy();
+  });
 });
