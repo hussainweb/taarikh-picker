@@ -39,20 +39,21 @@ jobs:
       - name: Quality gates
         run: |
           npm run check
+          npm run check:fallow
           npm test
           npm run typecheck
 
-      - name: Set package version
-        run: npm version ${{ inputs.version }} --no-git-tag-version
+      - name: Set package versions across workspaces
+        run: |
+          npm version ${{ inputs.version }} --workspaces --no-git-tag-version
+          npm version ${{ inputs.version }} --no-git-tag-version
+          npm pkg set dependencies.@taarikh/core="^${{ inputs.version }}" -w @taarikh/picker
 
       - name: Build distribution assets
         run: npm run build
 
       - name: Verify package
-        run: |
-          npx publint
-          npx attw --pack
-          npx size-limit
+        run: npm run verify
 
       - name: Create detached release commit and tag
         run: |
@@ -60,7 +61,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git checkout --detach
           git add -f dist
-          git add package.json package-lock.json
+          git add package.json package-lock.json packages/*/package.json
           if [ -f composer.json ]; then
             git add composer.json
           fi
@@ -73,5 +74,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish to npm with Trusted Publishing (OIDC)
-        run: npm publish --provenance --access public
+      - name: Publish @taarikh/core to npm with Trusted Publishing (OIDC)
+        run: npm publish --workspace packages/core --provenance --access public
+
+      - name: Publish @taarikh/picker to npm with Trusted Publishing (OIDC)
+        run: npm publish --workspace packages/picker --provenance --access public
