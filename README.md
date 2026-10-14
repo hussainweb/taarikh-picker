@@ -271,6 +271,7 @@ Override any of the design tokens on `:root`, a form container, or the input:
   --tp-radius: 8px;
   --tp-cell-size: 32px; /* Day cell size (enlarges to 44px on touch) */
   --tp-anchor-offset: 4px; /* Gap between input and anchored dialog */
+  --tp-dialog-width: min(92vw, 350px); /* Modal dialog width */
 }
 ```
 

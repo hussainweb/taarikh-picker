@@ -487,4 +487,64 @@ describe("TaarikhPicker & createPicker API", () => {
 
     picker.destroy();
   });
+
+  it("keeps all header navigation controls strictly contained within the dialog boundaries", () => {
+    // Test 1: Standard month with long name (Jumada al-Ula)
+    const picker1 = createPicker(input, {
+      initialDate: { year: 1448, month: 5, day: 4 }, // Jumada al-Ula 1448
+    });
+    picker1.open();
+    const el1 = picker1.getElements()!;
+    const dialogRect1 = el1.dialog.getBoundingClientRect();
+    const prevRect1 = el1.btnPrev.getBoundingClientRect();
+    const monthRect1 = el1.selectMonth.getBoundingClientRect();
+    const yearRect1 = el1.selectYear.getBoundingClientRect();
+    const nextRect1 = el1.btnNext.getBoundingClientRect();
+
+    expect(prevRect1.left).toBeGreaterThanOrEqual(dialogRect1.left);
+    expect(monthRect1.left).toBeGreaterThanOrEqual(dialogRect1.left);
+    expect(yearRect1.right).toBeLessThanOrEqual(dialogRect1.right);
+    expect(nextRect1.right).toBeLessThanOrEqual(dialogRect1.right);
+    picker1.destroy();
+
+    // Test 2: Longest month name (Ramadan al-Moazzam)
+    const picker2 = createPicker(input, {
+      initialDate: { year: 1448, month: 9, day: 1 }, // Ramadan al-Moazzam 1448
+    });
+    picker2.open();
+    const el2 = picker2.getElements()!;
+    const dialogRect2 = el2.dialog.getBoundingClientRect();
+    const prevRect2 = el2.btnPrev.getBoundingClientRect();
+    const monthRect2 = el2.selectMonth.getBoundingClientRect();
+    const yearRect2 = el2.selectYear.getBoundingClientRect();
+    const nextRect2 = el2.btnNext.getBoundingClientRect();
+
+    expect(prevRect2.left).toBeGreaterThanOrEqual(dialogRect2.left);
+    expect(monthRect2.left).toBeGreaterThanOrEqual(dialogRect2.left);
+    expect(yearRect2.right).toBeLessThanOrEqual(dialogRect2.right);
+    expect(nextRect2.right).toBeLessThanOrEqual(dialogRect2.right);
+    picker2.destroy();
+
+    // Test 3: RTL with Arabic labels
+    const picker3 = createPicker(input, {
+      dir: "rtl",
+      locale: "ar-EG",
+      initialDate: { year: 1448, month: 11, day: 1 }, // Zilqadah al-Haram
+    });
+    picker3.open();
+    const el3 = picker3.getElements()!;
+    const dialogRect3 = el3.dialog.getBoundingClientRect();
+    const prevRect3 = el3.btnPrev.getBoundingClientRect();
+    const monthRect3 = el3.selectMonth.getBoundingClientRect();
+    const yearRect3 = el3.selectYear.getBoundingClientRect();
+    const nextRect3 = el3.btnNext.getBoundingClientRect();
+
+    expect(prevRect3.right).toBeLessThanOrEqual(dialogRect3.right);
+    expect(prevRect3.left).toBeGreaterThanOrEqual(dialogRect3.left);
+    expect(nextRect3.left).toBeGreaterThanOrEqual(dialogRect3.left);
+    expect(nextRect3.right).toBeLessThanOrEqual(dialogRect3.right);
+    expect(monthRect3.left).toBeGreaterThanOrEqual(dialogRect3.left);
+    expect(yearRect3.left).toBeGreaterThanOrEqual(dialogRect3.left);
+    picker3.destroy();
+  });
 });

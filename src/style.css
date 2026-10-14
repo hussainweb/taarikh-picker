@@ -17,6 +17,7 @@
     --tp-cell-size: 32px;
     --tp-target-size: var(--tp-cell-size);
     --tp-anchor-offset: 4px;
+    --tp-dialog-width: min(92vw, 350px);
   }
 
   /* Trigger button adjacent to the input */
@@ -78,7 +79,7 @@
     box-shadow: var(--tp-shadow);
     font-family: var(--tp-font-family);
     font-size: var(--tp-font-size);
-    inline-size: 300px;
+    inline-size: var(--tp-dialog-width);
     max-inline-size: min(92vw, 360px);
     overflow: visible;
 
@@ -175,18 +176,22 @@
     align-items: center;
     justify-content: space-between;
     gap: 6px;
+    inline-size: 100%;
+    min-inline-size: 0;
   }
 
   :where(.tp-header-selectors) {
     display: flex;
     align-items: center;
     gap: 6px;
-    flex: 1;
+    flex: 1 1 auto;
     justify-content: center;
+    min-inline-size: 0;
   }
 
   :where(.tp-btn-prev),
   :where(.tp-btn-next) {
+    flex: 0 0 auto;
     box-sizing: border-box;
     display: inline-flex;
     align-items: center;
@@ -228,7 +233,7 @@
   :where(.tp-select-month),
   :where(.tp-select-year) {
     box-sizing: border-box;
-    padding: 4px 8px;
+    padding: 4px 6px;
     background: var(--tp-bg);
     color: var(--tp-text);
     border: var(--tp-border);
@@ -237,6 +242,18 @@
     font-size: var(--tp-font-size);
     min-block-size: var(--tp-target-size);
     cursor: pointer;
+  }
+
+  :where(.tp-select-month) {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    max-inline-size: 100%;
+    text-overflow: ellipsis;
+  }
+
+  :where(.tp-select-year) {
+    flex: 0 0 auto;
+    min-inline-size: 0;
   }
 
   :where(.tp-live-region) {
