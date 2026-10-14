@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DialogShell } from "../../src/ui/dialog.js";
-import type { PlainDate } from "../../src/engine/index.js";
-import { fatimidAstronomicalCalendar, today } from "../../src/engine/index.js";
+import type { PlainDate } from "@taarikh/core";
+import { fatimidAstronomicalCalendar, today } from "@taarikh/core";
 import { resetUniqueIdCounter } from "../../src/ui/dom.js";
 
 describe("Input binding, typed validation, and events (tp-il8.3.3)", () => {

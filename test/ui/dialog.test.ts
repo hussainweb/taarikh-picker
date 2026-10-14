@@ -1,9 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DialogShell } from "../../src/ui/dialog.js";
 import { createPicker, TaarikhPicker } from "../../src/index.js";
-import type { MonthLabels, PlainDate } from "../../src/engine/index.js";
-import { fatimidAstronomicalCalendar } from "../../src/engine/index.js";
-import { formatDayAriaLabel, formatMonthHeading } from "../../src/format/index.js";
+import type { MonthLabels, PlainDate } from "@taarikh/core";
+import { fatimidAstronomicalCalendar, formatDayAriaLabel, formatMonthHeading } from "@taarikh/core";
 import { resetUniqueIdCounter } from "../../src/ui/dom.js";
 
 describe("DialogShell - WAI-ARIA APG Date Picker Dialog", () => {

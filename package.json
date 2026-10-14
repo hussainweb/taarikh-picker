@@ -8,6 +8,9 @@
     "type": "git",
     "url": "git+https://github.com/hussainweb/taarikh-picker.git"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "files": [
     "dist"
   ],
@@ -38,6 +41,9 @@
     "fallow": "fallow",
     "test": "vp test",
     "ci": "npm run check && npm run check:fallow && npm run test && npm run build && publint && attw --pack && size-limit"
+  },
+  "dependencies": {
+    "@taarikh/core": "^0.1.0"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",

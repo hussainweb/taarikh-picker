@@ -1,11 +1,17 @@
 import "./style.css";
 
-import type { CalendarEngine, PlainDate } from "./engine/index.js";
-import { fatimidAstronomicalCalendar } from "./engine/index.js";
+import type { CalendarEngine, PlainDate } from "@taarikh/core";
+import { fatimidAstronomicalCalendar } from "@taarikh/core";
 import { DialogShell } from "./ui/dialog.js";
 import type { DialogElements, PickerLabels } from "./ui/types.js";
 
-export type { CalendarEngine, MonthLabels, PlainDate } from "./engine/index.js";
+export type {
+  CalendarEngine,
+  DisplayOptions,
+  MonthLabels,
+  PlainDate,
+  WeekdayLabels,
+} from "@taarikh/core";
 export {
   DEFAULT_MONTH_LABELS,
   FATIMID_MONTH_NAMES,
@@ -14,33 +20,29 @@ export {
   addDays,
   addMonths,
   addYears,
+  clearFormatterCache,
   compareDates,
   fatimidAstronomicalCalendar,
-  getMonthName,
-  gregorianToJulianDay,
-  isAfter,
-  isBefore,
-  isSameDay,
-  today,
-  weekday,
-  weekdayFromJdn,
-} from "./engine/index.js";
-
-export type { DisplayOptions, WeekdayLabels } from "./format/index.js";
-export {
-  clearFormatterCache,
   formatDayAriaLabel,
   formatDisplay,
   formatMonthHeading,
   formatValue,
   formatYear,
   getDateTimeFormatter,
+  getMonthName,
   getNumberFormatter,
   getWeekdayNames,
+  gregorianToJulianDay,
   inferDateOrder,
+  isAfter,
   isArabicScriptLocale,
+  isBefore,
+  isSameDay,
   parseValue,
-} from "./format/index.js";
+  today,
+  weekday,
+  weekdayFromJdn,
+} from "@taarikh/core";
 
 export type { DialogElements, PickerLabels, ResolvedPickerLabels } from "./ui/types.js";
 export { DEFAULT_LABELS } from "./ui/dom.js";

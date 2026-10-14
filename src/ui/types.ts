@@ -1,6 +1,4 @@
-import type { CalendarEngine, PlainDate } from "../engine/types.js";
-import type { MonthLabels } from "../engine/labels.js";
-import type { WeekdayLabels } from "../format/types.js";
+import type { CalendarEngine, MonthLabels, PlainDate, WeekdayLabels } from "@taarikh/core";
 
 /**
  * Localisable labels for the datepicker dialog shell and controls.

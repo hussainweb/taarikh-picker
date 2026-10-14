@@ -11,7 +11,10 @@
     "declaration": true,
     "isolatedDeclarations": true,
     "erasableSyntaxOnly": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "@taarikh/core": ["./packages/core/src/index.ts"]
+    }
   },
   "include": ["src"]
 }

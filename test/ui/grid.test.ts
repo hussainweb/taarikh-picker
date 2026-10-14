@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import "../../src/style.css";
-import { fatimidAstronomicalCalendar } from "../../src/engine/index.js";
-import type { PlainDate } from "../../src/engine/index.js";
+import { fatimidAstronomicalCalendar } from "@taarikh/core";
+import type { PlainDate } from "@taarikh/core";
 import { MonthGrid } from "../../src/ui/grid.js";
 import { DialogShell } from "../../src/ui/dialog.js";
 

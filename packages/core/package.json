@@ -1,0 +1,36 @@
+{
+  "name": "@taarikh/core",
+  "version": "0.1.0",
+  "description": "Headless calendar arithmetic, Fatimid Astronomical Hijri engine, and date formatting",
+  "homepage": "https://github.com/hussainweb/taarikh-picker#readme",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hussainweb/taarikh-picker.git",
+    "directory": "packages/core"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "dev": "vp dev",
+    "build": "vp pack",
+    "typecheck": "tsc --noEmit",
+    "check": "vp check",
+    "test": "vp test"
+  }
+}

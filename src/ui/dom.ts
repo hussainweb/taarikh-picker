@@ -1,4 +1,4 @@
-import { DEFAULT_MONTH_LABELS } from "../engine/labels.js";
+import { DEFAULT_MONTH_LABELS } from "@taarikh/core";
 import type { ResolvedPickerLabels } from "./types.js";
 
 let idCounter: number = 0;

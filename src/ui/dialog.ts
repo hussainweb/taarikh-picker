@@ -1,9 +1,16 @@
-import type { CalendarEngine, PlainDate } from "../engine/types.js";
-import { fatimidAstronomicalCalendar } from "../engine/fatimid.js";
-import { addMonths, isAfter, isBefore, today } from "../engine/helpers.js";
-import { getMonthName } from "../engine/labels.js";
-import { formatMonthHeading, formatYear } from "../format/index.js";
-import { formatValue, parseValue } from "../format/value.js";
+import type { CalendarEngine, PlainDate } from "@taarikh/core";
+import {
+  addMonths,
+  fatimidAstronomicalCalendar,
+  formatMonthHeading,
+  formatValue,
+  formatYear,
+  getMonthName,
+  isAfter,
+  isBefore,
+  parseValue,
+  today,
+} from "@taarikh/core";
 import { CALENDAR_SVG_ICON, DEFAULT_LABELS, nextUniqueId } from "./dom.js";
 import { MonthGrid } from "./grid.js";
 import type { DialogElements, DialogShellOptions, ResolvedPickerLabels } from "./types.js";
