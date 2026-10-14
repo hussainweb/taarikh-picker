@@ -5,6 +5,7 @@ node_modules/
 dist/
 *.tsbuildinfo
 .vitest/
+.playwright-cli/
 
 # Beads / Dolt files (added by bd init)
 .dolt/
