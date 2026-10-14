@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
@@ -29,6 +31,9 @@ jobs:
 
       - name: Type check
         run: npm run typecheck
+
+      - name: Fallow audit
+        run: npx fallow audit --format github-annotations
 
       - name: Run CI checks
         run: npm run ci
