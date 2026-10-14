@@ -34,8 +34,10 @@
     "typecheck": "tsc --noEmit && tsc -p tsconfig.test.json --noEmit",
     "typecheck:test": "tsc -p tsconfig.test.json --noEmit",
     "check": "vp check",
+    "check:fallow": "fallow audit",
+    "fallow": "fallow",
     "test": "vp test",
-    "ci": "npm run check && npm run test && npm run build && publint && attw --pack && size-limit"
+    "ci": "npm run check && npm run check:fallow && npm run test && npm run build && publint && attw --pack && size-limit"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
