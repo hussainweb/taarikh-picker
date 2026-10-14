@@ -3,6 +3,7 @@ import { fatimidAstronomicalCalendar } from "../engine/fatimid.js";
 import { addMonths, today } from "../engine/helpers.js";
 import { getMonthName } from "../engine/labels.js";
 import { CALENDAR_SVG_ICON, DEFAULT_LABELS, nextUniqueId } from "./dom.js";
+import { MonthGrid } from "./grid.js";
 import type { DialogElements, DialogShellOptions, ResolvedPickerLabels } from "./types.js";
 
 /**
@@ -13,8 +14,8 @@ import type { DialogElements, DialogShellOptions, ResolvedPickerLabels } from ".
  * - Sibling trigger button next to the input (does not open on input focus).
  * - CSS Anchor Positioning relative to the input with centered fallback.
  * - Header with previous/next month buttons, month/year selects, and polite live region.
+ * - Month grid (<table role="grid">) with roving tabindex and APG keyboard navigation.
  * - Footer with Today and Clear buttons.
- * - Grid container placeholder for month table keyboard navigation.
  * - Complete, idempotent destroy() method unbinding listeners and removing DOM nodes.
  */
 export class DialogShell {
@@ -24,7 +25,9 @@ export class DialogShell {
   private readonly labels: ResolvedPickerLabels;
   private readonly abortController: AbortController = new AbortController();
   private readonly elements: DialogElements;
+  private readonly grid: MonthGrid;
   private visibleDate: PlainDate;
+  private selectedDate: PlainDate | undefined;
   private destroyed: boolean = false;
   private previousAnchorName: string = "";
 
@@ -130,10 +133,35 @@ export class DialogShell {
 
     dialog.appendChild(header);
 
-    // Grid container placeholder (to be populated by tp-il8.3.2)
+    // Grid container
     const gridContainer = document.createElement("div");
     gridContainer.className = "tp-grid-container";
     dialog.appendChild(gridContainer);
+
+    this.selectedDate = this.options.selectedDate;
+
+    // Month grid with APG keyboard navigation
+    this.grid = new MonthGrid({
+      calendarEngine: this.engine,
+      visibleDate: this.visibleDate,
+      selectedDate: this.selectedDate,
+      minDate: this.options.minDate,
+      maxDate: this.options.maxDate,
+      locale: this.options.locale,
+      firstDayOfWeek: this.options.firstDayOfWeek,
+      isRtl: this.options.isRtl,
+      labels: this.options.labels,
+      labelledBy: titleId,
+      onSelect: (date) => {
+        this.selectedDate = date;
+        this.options.onSelect?.(date);
+        this.close();
+      },
+      onNavigate: (date) => {
+        this.setVisibleDate(date, date.day);
+      },
+    });
+    gridContainer.appendChild(this.grid.getElement());
 
     // Footer container
     const footer = document.createElement("footer");
@@ -164,6 +192,7 @@ export class DialogShell {
       selectYear,
       liveRegion,
       gridContainer,
+      grid: this.grid.getElement(),
       footer,
       btnToday,
       btnClear,
@@ -184,8 +213,21 @@ export class DialogShell {
     return this.elements;
   }
 
+  public getGrid(): MonthGrid {
+    return this.grid;
+  }
+
   public getVisibleDate(): PlainDate {
     return this.visibleDate;
+  }
+
+  public getSelectedDate(): PlainDate | undefined {
+    return this.selectedDate;
+  }
+
+  public setSelectedDate(date: PlainDate | undefined): void {
+    this.selectedDate = date;
+    this.grid.setSelectedDate(date);
   }
 
   public isOpen(): boolean {
@@ -198,6 +240,7 @@ export class DialogShell {
     }
     this.elements.dialog.showModal();
     this.elements.trigger.setAttribute("aria-expanded", "true");
+    this.grid.focusActiveDay();
     this.options.onOpen?.();
   }
 
@@ -210,12 +253,16 @@ export class DialogShell {
     this.elements.trigger.focus();
   }
 
-  public setVisibleDate(date: PlainDate): void {
+  public setVisibleDate(date: PlainDate, focusDay?: number): void {
     if (this.destroyed) {
       return;
     }
     this.visibleDate = date;
     this.updateVisibleDisplay();
+    this.grid.setVisibleDate(date, focusDay);
+    if (this.isOpen() && focusDay !== undefined) {
+      this.grid.focusActiveDay();
+    }
     this.options.onMonthChange?.(date);
   }
 
@@ -233,6 +280,7 @@ export class DialogShell {
       }
     }
 
+    this.grid.destroy();
     this.abortController.abort();
     this.elements.trigger.remove();
     this.elements.dialog.remove();
@@ -350,7 +398,8 @@ export class DialogShell {
       "click",
       () => {
         const todayDate = today(this.engine);
-        this.setVisibleDate(todayDate);
+        this.setVisibleDate(todayDate, todayDate.day);
+        this.setSelectedDate(todayDate);
         this.options.onToday?.(todayDate);
       },
       { signal },
@@ -361,6 +410,7 @@ export class DialogShell {
       "click",
       () => {
         this.input.value = "";
+        this.setSelectedDate(undefined);
         this.options.onClear?.();
       },
       { signal },

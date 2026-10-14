@@ -48,6 +48,7 @@ export interface DialogElements {
   readonly footer: HTMLElement;
   readonly btnToday: HTMLButtonElement;
   readonly btnClear: HTMLButtonElement;
+  readonly grid?: HTMLTableElement | undefined;
 }
 
 /**
@@ -60,9 +61,14 @@ export interface DialogShellOptions {
   readonly maxDate?: PlainDate | undefined;
   readonly calendarEngine?: CalendarEngine | undefined;
   readonly initialDate?: PlainDate | undefined;
+  readonly selectedDate?: PlainDate | undefined;
+  readonly firstDayOfWeek?: number | undefined;
+  readonly locale?: string | undefined;
+  readonly isRtl?: boolean | undefined;
   readonly onMonthChange?: ((date: PlainDate) => void) | undefined;
   readonly onToday?: ((todayDate: PlainDate) => void) | undefined;
   readonly onClear?: (() => void) | undefined;
   readonly onOpen?: (() => void) | undefined;
   readonly onClose?: (() => void) | undefined;
+  readonly onSelect?: ((date: PlainDate) => void) | undefined;
 }

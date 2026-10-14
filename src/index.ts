@@ -40,6 +40,7 @@ export {
 
 export type { DialogElements, DialogShellOptions, PickerLabels } from "./ui/types.js";
 export { DialogShell } from "./ui/dialog.js";
+export { MonthGrid, type MonthGridOptions } from "./ui/grid.js";
 export { DEFAULT_LABELS } from "./ui/dom.js";
 
 /**
@@ -52,12 +53,16 @@ export interface TaarikhPickerOptions {
   readonly maxDate?: PlainDate | undefined;
   readonly engine?: CalendarEngine | undefined;
   readonly initialDate?: PlainDate | undefined;
+  readonly selectedDate?: PlainDate | undefined;
+  readonly firstDayOfWeek?: number | undefined;
+  readonly isRtl?: boolean | undefined;
   readonly idPrefix?: string | undefined;
   readonly onMonthChange?: ((date: PlainDate) => void) | undefined;
   readonly onToday?: ((todayDate: PlainDate) => void) | undefined;
   readonly onClear?: (() => void) | undefined;
   readonly onOpen?: (() => void) | undefined;
   readonly onClose?: (() => void) | undefined;
+  readonly onSelect?: ((date: PlainDate) => void) | undefined;
 }
 
 /**
@@ -87,12 +92,17 @@ export class TaarikhPicker {
         maxDate: this.options.maxDate,
         calendarEngine: this.options.engine,
         initialDate: this.options.initialDate,
+        selectedDate: this.options.selectedDate,
+        firstDayOfWeek: this.options.firstDayOfWeek,
+        locale: this.options.locale,
+        isRtl: this.options.isRtl,
         idPrefix: this.options.idPrefix,
         onMonthChange: this.options.onMonthChange,
         onToday: this.options.onToday,
         onClear: this.options.onClear,
         onOpen: this.options.onOpen,
         onClose: this.options.onClose,
+        onSelect: this.options.onSelect,
       });
     } else {
       this.input = undefined;

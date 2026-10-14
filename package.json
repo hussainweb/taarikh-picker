@@ -42,12 +42,12 @@
     {
       "name": "ESM",
       "path": "dist/index.js",
-      "limit": "5 KB"
+      "limit": "8 KB"
     },
     {
       "name": "IIFE",
       "path": "dist/index.iife.js",
-      "limit": "6 KB"
+      "limit": "8 KB"
     }
   ]
 }

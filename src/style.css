@@ -210,19 +210,92 @@
     min-block-size: 1.25em;
   }
 
-  /* Grid container placeholder */
+  /* Grid container and table */
   :where(.tp-grid-container) {
     box-sizing: border-box;
-    min-block-size: 180px;
-    display: flex;
+    margin-block-end: 10px;
+  }
+
+  :where(.tp-grid-table) {
+    inline-size: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  :where(.tp-grid-head-cell) {
+    box-sizing: border-box;
+    padding: 4px 0 6px 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--tp-text-muted);
+    text-align: center;
+  }
+
+  :where(.tp-grid-cell) {
+    box-sizing: border-box;
+    padding: 2px;
+    text-align: center;
+  }
+
+  :where(.tp-grid-cell-empty) {
+    padding: 0;
+  }
+
+  :where(.tp-day-btn) {
+    box-sizing: border-box;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-block-end: 12px;
-    border: 1px dashed var(--tp-border-color);
+    inline-size: 100%;
+    min-inline-size: var(--tp-target-size);
+    min-block-size: var(--tp-target-size);
+    aspect-ratio: 1;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    color: var(--tp-text);
+    border: 1px solid transparent;
     border-radius: var(--tp-radius);
-    color: var(--tp-text-muted);
+    cursor: pointer;
+    font-family: var(--tp-font-family);
     font-size: 0.875rem;
-    padding: 8px;
+    line-height: 1;
+    transition:
+      background-color 120ms ease,
+      border-color 120ms ease,
+      color 120ms ease;
+  }
+
+  :where(.tp-day-btn:hover:not(.tp-day-disabled)) {
+    background: var(--tp-btn-hover-bg);
+  }
+
+  :where(.tp-day-btn:focus-visible) {
+    outline: var(--tp-focus-ring);
+    outline-offset: 1px;
+    z-index: 1;
+  }
+
+  :where(.tp-day-btn[aria-current="date"]) {
+    border-color: var(--tp-accent);
+    font-weight: 700;
+  }
+
+  :where(.tp-day-btn[aria-selected="true"]) {
+    background: var(--tp-accent);
+    color: #ffffff;
+    font-weight: 700;
+    border-color: var(--tp-accent);
+  }
+
+  :where(.tp-day-btn[aria-selected="true"]:hover) {
+    background: var(--tp-accent);
+  }
+
+  :where(.tp-day-btn[aria-disabled="true"]),
+  :where(.tp-day-btn.tp-day-disabled) {
+    opacity: 0.35;
+    cursor: not-allowed;
   }
 
   /* Footer */
