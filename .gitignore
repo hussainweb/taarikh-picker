@@ -4,6 +4,7 @@ node_modules/
 # Build outputs
 dist/
 *.tsbuildinfo
+.vitest/
 
 # Beads / Dolt files (added by bd init)
 .dolt/
