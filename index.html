@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Taarikh Datepicker - Calendar Dialog Shell</title>
+    <title>Taarikh Datepicker - Interactive Playground</title>
     <style>
       :root {
         font-family:
@@ -15,15 +15,24 @@
           sans-serif;
         line-height: 1.5;
         color-scheme: light dark;
-        color: #202124;
-        background-color: #f8f9fa;
+        --bg-page: light-dark(#f8f9fa, #121212);
+        --bg-card: light-dark(#ffffff, #1e1e1e);
+        --bg-panel: light-dark(#f1f3f4, #2a2b2e);
+        --border-color: light-dark(#dadce0, #3c4043);
+        --text-color: light-dark(#202124, #e8eaed);
+        --text-muted: light-dark(#5f6368, #9aa0a6);
+        --accent-color: #1a73e8;
+
+        background-color: var(--bg-page);
+        color: var(--text-color);
       }
 
-      @media (prefers-color-scheme: dark) {
-        :root {
-          color: #e8eaed;
-          background-color: #121212;
-        }
+      html.light {
+        color-scheme: light;
+      }
+
+      html.dark {
+        color-scheme: dark;
       }
 
       body {
@@ -34,50 +43,126 @@
       }
 
       .demo-container {
-        max-width: 720px;
+        max-width: 840px;
         width: 100%;
-        background: light-dark(#ffffff, #1e1e1e);
-        border: 1px solid light-dark(#dadce0, #3c4043);
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
         border-radius: 12px;
         padding: 2rem;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
       }
 
-      h1 {
-        margin-top: 0;
-        font-size: 1.6rem;
+      header.playground-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .header-titles h1 {
+        margin: 0;
+        font-size: 1.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+      }
+
+      .badge {
+        font-size: 0.75rem;
+        background: var(--accent-color);
+        color: #ffffff;
+        padding: 3px 10px;
+        border-radius: 999px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+
+      .subtitle {
+        color: var(--text-muted);
+        margin: 0.35rem 0 0 0;
+        font-size: 0.95rem;
+      }
+
+      .theme-toolbar {
         display: flex;
         align-items: center;
         gap: 0.5rem;
       }
 
-      .badge {
-        font-size: 0.75rem;
-        background: #1a73e8;
-        color: white;
-        padding: 2px 8px;
-        border-radius: 999px;
+      .btn-theme {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 6px 14px;
+        background: var(--bg-panel);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        color: inherit;
+        cursor: pointer;
+        font-size: 0.875rem;
         font-weight: 500;
+        transition:
+          background-color 150ms ease,
+          border-color 150ms ease;
       }
 
-      p.subtitle {
-        color: light-dark(#5f6368, #9aa0a6);
-        margin-top: -0.25rem;
-        margin-bottom: 1.5rem;
+      .btn-theme:hover {
+        background: light-dark(#e8eaed, #35363a);
+      }
+
+      .demo-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      @media (min-width: 680px) {
+        .demo-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      .field-card {
+        padding: 1.5rem;
+        background: var(--bg-panel);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .field-card.full-width {
+        grid-column: 1 / -1;
+      }
+
+      .card-title {
+        font-weight: 600;
+        font-size: 1.05rem;
+        margin-bottom: 0.35rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .card-desc {
+        font-size: 0.8125rem;
+        color: var(--text-muted);
+        margin-bottom: 1rem;
       }
 
       .field-group {
-        margin: 2rem 0;
-        padding: 1.5rem;
-        background: light-dark(#f8f9fa, #2a2b2e);
-        border-radius: 8px;
-        border: 1px solid light-dark(#e8eaed, #3c4043);
+        margin-bottom: 1rem;
       }
 
       .field-group label {
         display: block;
         font-weight: 600;
-        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+        margin-bottom: 0.4rem;
       }
 
       .input-wrapper {
@@ -86,215 +171,520 @@
       }
 
       .demo-input {
+        box-sizing: border-box;
         padding: 8px 12px;
-        font-size: 1rem;
-        border: 1px solid light-dark(#dadce0, #5f6368);
+        font-size: 0.9375rem;
+        border: 1px solid var(--border-color);
         border-radius: 6px;
-        background: light-dark(#ffffff, #1e1e1e);
+        background: var(--bg-card);
         color: inherit;
-        width: 220px;
+        width: 100%;
+        max-width: 220px;
+        font-family: inherit;
       }
 
       .demo-input:focus {
-        outline: 2px solid #1a73e8;
+        outline: 2px solid var(--accent-color);
         outline-offset: 1px;
       }
 
+      .demo-input[aria-invalid="true"] {
+        border-color: #d93025;
+      }
+
       .controls-panel {
-        margin-top: 1.5rem;
         display: flex;
         flex-wrap: wrap;
         gap: 0.5rem;
+        margin-top: 0.75rem;
       }
 
       .btn-action {
         padding: 6px 12px;
-        border: 1px solid light-dark(#dadce0, #5f6368);
-        background: light-dark(#ffffff, #2a2b2e);
+        border: 1px solid var(--border-color);
+        background: var(--bg-card);
         color: inherit;
         border-radius: 6px;
         cursor: pointer;
-        font-size: 0.875rem;
+        font-size: 0.8125rem;
+        transition: background-color 150ms ease;
       }
 
       .btn-action:hover {
-        background: light-dark(#f1f3f4, #35363a);
+        background: light-dark(#f8f9fa, #323336);
+      }
+
+      .btn-action.active {
+        background: var(--accent-color);
+        color: #ffffff;
+        border-color: var(--accent-color);
+      }
+
+      .log-section {
+        margin-top: 2rem;
+      }
+
+      .log-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+      }
+
+      .log-title {
+        font-weight: 600;
+        font-size: 0.9375rem;
+      }
+
+      .log-panel {
+        padding: 1rem;
+        background: light-dark(#202124, #000000);
+        color: #34d399;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 0.8125rem;
+        line-height: 1.45;
+        border-radius: 8px;
+        max-height: 180px;
+        overflow-y: auto;
+      }
+
+      .log-line {
+        margin-bottom: 0.25rem;
+        word-break: break-all;
+      }
+
+      .log-time {
+        color: #9ca3af;
+        margin-right: 0.5rem;
       }
 
       .features-list {
-        margin: 2rem 0;
+        margin: 2.5rem 0 0 0;
         padding: 0;
         list-style: none;
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
         gap: 1rem;
       }
 
       .features-list li {
         padding: 1rem;
-        background: light-dark(#f8f9fa, #252629);
+        background: var(--bg-panel);
         border-radius: 8px;
-        border-left: 4px solid #1a73e8;
-        font-size: 0.875rem;
+        border-inline-start: 4px solid var(--accent-color);
+        font-size: 0.8125rem;
       }
 
       .features-list strong {
         display: block;
         margin-bottom: 0.25rem;
-        color: light-dark(#202124, #ffffff);
-      }
-
-      .log-panel {
-        margin-top: 1.5rem;
-        padding: 1rem;
-        background: light-dark(#202124, #000000);
-        color: #34d399;
-        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-        font-size: 0.8125rem;
-        border-radius: 8px;
-        max-height: 160px;
-        overflow-y: auto;
-      }
-
-      .log-title {
-        color: #9ca3af;
-        margin-bottom: 0.5rem;
-        font-weight: bold;
+        font-size: 0.875rem;
+        color: var(--text-color);
       }
     </style>
   </head>
   <body>
     <div class="demo-container">
-      <h1>
-        Taarikh Datepicker
-        <span class="badge">tp-il8.3.1</span>
-      </h1>
-      <p class="subtitle">
-        Calendar dialog shell: &lt;dialog&gt; + showModal, trigger button, header, footer, and CSS
-        anchor positioning.
-      </p>
+      <header class="playground-header">
+        <div class="header-titles">
+          <h1>
+            Taarikh Datepicker
+            <span class="badge">Playground</span>
+          </h1>
+          <p class="subtitle">
+            Accessible, zero-dependency Fatimid Hijri calendar datepicker component
+          </p>
+        </div>
+        <div class="theme-toolbar">
+          <button type="button" id="btn-theme-toggle" class="btn-theme" title="Toggle color scheme">
+            <span id="theme-icon" aria-hidden="true">🌓</span>
+            <span id="theme-label">Theme: Auto</span>
+          </button>
+        </div>
+      </header>
 
-      <div class="field-group">
-        <label for="demo-input">Hijri Date Input</label>
-        <div class="input-wrapper">
-          <input
-            type="text"
-            id="demo-input"
-            class="demo-input"
-            placeholder="YYYY-MM-DD"
-            autocomplete="off"
-          />
-        </div>
-        <div class="controls-panel">
-          <button type="button" id="btn-api-open" class="btn-action">Open via API</button>
-          <button type="button" id="btn-api-close" class="btn-action">Close via API</button>
-          <button type="button" id="btn-toggle-picker" class="btn-action">Destroy Picker</button>
-        </div>
+      <div class="demo-grid">
+        <!-- Section 1: Standard Fatimid Picker -->
+        <section class="field-card">
+          <div>
+            <div class="card-title">
+              <span>Standard Picker</span>
+            </div>
+            <p class="card-desc">
+              English labels, Fatimid Astronomical calendar, default formatting (YYYY-MM-DD).
+            </p>
+            <div class="field-group">
+              <label for="input-standard">Select Hijri Date</label>
+              <div class="input-wrapper">
+                <input
+                  type="text"
+                  id="input-standard"
+                  class="demo-input"
+                  placeholder="YYYY-MM-DD"
+                  autocomplete="off"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="controls-panel">
+            <button type="button" id="btn-std-open" class="btn-action">Open</button>
+            <button type="button" id="btn-std-close" class="btn-action">Close</button>
+            <button type="button" id="btn-std-today" class="btn-action">Set Today</button>
+            <button type="button" id="btn-std-clear" class="btn-action">Clear</button>
+            <button type="button" id="btn-std-toggle" class="btn-action">Destroy</button>
+          </div>
+        </section>
+
+        <!-- Section 2: RTL & Arabic Localisation -->
+        <section class="field-card" id="card-rtl">
+          <div>
+            <div class="card-title">
+              <span>RTL &amp; Arabic Localisation</span>
+              <button
+                type="button"
+                id="btn-toggle-dir"
+                class="btn-action"
+                title="Toggle RTL direction"
+              >
+                dir: rtl
+              </button>
+            </div>
+            <p class="card-desc">
+              Arabic label pack, Eastern numerals, mirrored glyphs (‹/›), and mirrored arrow keys.
+            </p>
+            <div class="field-group" id="container-rtl" dir="rtl">
+              <label for="input-rtl">التاريخ الهجري (RTL)</label>
+              <div class="input-wrapper">
+                <input
+                  type="text"
+                  id="input-rtl"
+                  class="demo-input"
+                  placeholder="YYYY-MM-DD"
+                  autocomplete="off"
+                  dir="rtl"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="controls-panel">
+            <button type="button" id="btn-rtl-open" class="btn-action">فتح التقويم (Open)</button>
+            <button type="button" id="btn-rtl-close" class="btn-action">إغلاق (Close)</button>
+            <button type="button" id="btn-rtl-clear" class="btn-action">مسح (Clear)</button>
+          </div>
+        </section>
+
+        <!-- Section 3: Min & Max Date Bounds -->
+        <section class="field-card full-width">
+          <div>
+            <div class="card-title">
+              <span>Min &amp; Max Date Constraints</span>
+            </div>
+            <p class="card-desc">
+              Restricted to 1445 AH Ramadan (1445-09-01) through Zilhajj (1445-12-30). Out-of-bounds
+              dates are disabled and invalid inputs show aria-invalid="true".
+            </p>
+            <div class="field-group">
+              <label for="input-bounded">Select Date (1445-09-01 to 1445-12-30)</label>
+              <div class="input-wrapper">
+                <input
+                  type="text"
+                  id="input-bounded"
+                  class="demo-input"
+                  placeholder="YYYY-MM-DD"
+                  autocomplete="off"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="controls-panel">
+            <button type="button" id="btn-bounded-min" class="btn-action">
+              Set Min (1445-09-01)
+            </button>
+            <button type="button" id="btn-bounded-max" class="btn-action">
+              Set Max (1445-12-30)
+            </button>
+            <button type="button" id="btn-bounded-invalid" class="btn-action">
+              Set Invalid (1445-01-01)
+            </button>
+            <button type="button" id="btn-bounded-clear" class="btn-action">Clear</button>
+          </div>
+        </section>
       </div>
 
-      <div class="log-title">Live Event Stream:</div>
-      <div id="event-log" class="log-panel">
-        <div>[Ready] Datepicker initialized on #demo-input</div>
-      </div>
+      <!-- Section 4: Live Event Stream -->
+      <section class="log-section">
+        <div class="log-header">
+          <div class="log-title">Live Event Stream (input, change, taarikh:change, lifecycle)</div>
+          <button type="button" id="btn-clear-log" class="btn-action">Clear Log</button>
+        </div>
+        <div id="event-log" class="log-panel" aria-live="polite" aria-atomic="false">
+          <div class="log-line">
+            <span class="log-time">[Init]</span> Interactive demo initialized with TaarikhPicker.
+          </div>
+        </div>
+      </section>
 
+      <!-- Architecture & Compliance Highlights -->
       <ul class="features-list">
         <li>
-          <strong>WAI-ARIA APG Pattern</strong>
-          Freely typeable text input with adjacent trigger button (aria-haspopup="dialog"). Input
-          focus never opens the dialog.
+          <strong>WAI-ARIA APG Dialog Pattern</strong>
+          Native &lt;dialog&gt; opened with showModal() into the top layer. Freely typeable input
+          with an adjacent trigger button; input focus never auto-opens.
         </li>
         <li>
-          <strong>Native &lt;dialog&gt; Modal</strong>
-          Opens via showModal() into the browser top layer with inert background, native Escape key
-          dismiss, and focus return.
+          <strong>RTL &amp; Logical Properties</strong>
+          Layout mirrors automatically via CSS logical properties. Prev/next glyphs mirror and
+          keyboard arrow keys mirror in RTL (Right arrow moves back, Left arrow moves forward).
+        </li>
+        <li>
+          <strong>Value Contract Preserved</strong>
+          Submitted value remains strictly ASCII YYYY-MM-DD for seamless backend validation, while
+          Intl localized digits and labels are used exclusively for display.
         </li>
         <li>
           <strong>CSS Anchor Positioning</strong>
-          Anchored next to the input with position-anchor &amp; position-area, falling back to
-          centered viewport display in older browsers.
+          Native anchor-name and position-anchor align the modal adjacent to the input with
+          automatic flip-block/flip-inline fallbacks and centered modal fallback.
         </li>
         <li>
-          <strong>Backdrop &amp; Outside Click</strong>
-          Native closedby="any" support plus backdrop click handler for outside dismiss.
+          <strong>Zero Runtime Dependencies</strong>
+          No jQuery, no React, no external date libraries. Vanilla TypeScript bundled to pure ESM
+          and IIFE with complete .destroy() teardown safety.
         </li>
         <li>
-          <strong>Polite Live Region</strong>
-          Announces visible month and year changes to screen readers as user navigates header
-          controls.
-        </li>
-        <li>
-          <strong>AJAX &amp; Detach Safe</strong>
-          Single AbortController signal unbinds all listeners on destroy(), removing sibling dialog
-          elements cleanly without memory leaks.
+          <strong>Intl Formatting &amp; Caching</strong>
+          High-performance Intl.DateTimeFormat and Intl.NumberFormat caching with full
+          user-overridable string dictionaries and accurate Arabic-script comma detection.
         </li>
       </ul>
     </div>
 
     <script type="module">
-      import { createPicker } from "./src/index.ts";
+      import { createPicker, today, fatimidAstronomicalCalendar } from "./src/index.ts";
 
-      const input = document.getElementById("demo-input");
       const logEl = document.getElementById("event-log");
-      const btnOpen = document.getElementById("btn-api-open");
-      const btnClose = document.getElementById("btn-api-close");
-      const btnToggle = document.getElementById("btn-toggle-picker");
-
-      function log(msg) {
+      function logEvent(source, eventName, detail) {
         const line = document.createElement("div");
+        line.className = "log-line";
         const time = new Date().toLocaleTimeString();
-        line.textContent = `[${time}] ${msg}`;
+        line.innerHTML = `<span class="log-time">[${time}]</span> <strong>${source}</strong> &rarr; <em>${eventName}</em>: ${detail}`;
         logEl.appendChild(line);
         logEl.scrollTop = logEl.scrollHeight;
       }
 
-      let picker = null;
-
-      input.addEventListener("change", () => {
-        log(
-          `Input change event: value="${input.value}", aria-invalid="${input.getAttribute("aria-invalid")}"`,
-        );
-      });
-      input.addEventListener("taarikh:change", (e) => {
-        log(
-          `Custom taarikh:change: date=${JSON.stringify(e.detail.date)}, value="${e.detail.value}"`,
-        );
+      document.getElementById("btn-clear-log").addEventListener("click", () => {
+        logEl.innerHTML = "";
       });
 
-      function initPicker() {
-        picker = createPicker(input, {
-          onOpen: () => log("Event: dialog opened"),
-          onClose: () => log("Event: dialog closed"),
-          onMonthChange: (date) => log(`Event: month changed to ${date.month}/${date.year}`),
-          onToday: (date) => log(`Event: today clicked (${date.year}-${date.month}-${date.day})`),
-          onClear: () => log("Event: clear clicked (input cleared)"),
+      // --- Theme Toggle ---
+      const themeBtn = document.getElementById("btn-theme-toggle");
+      const themeLabel = document.getElementById("theme-label");
+      const themes = ["auto", "light", "dark"];
+      let currentThemeIdx = 0;
+
+      themeBtn.addEventListener("click", () => {
+        currentThemeIdx = (currentThemeIdx + 1) % themes.length;
+        const theme = themes[currentThemeIdx];
+        document.documentElement.classList.remove("light", "dark");
+        if (theme === "light") {
+          document.documentElement.classList.add("light");
+          themeLabel.textContent = "Theme: Light";
+        } else if (theme === "dark") {
+          document.documentElement.classList.add("dark");
+          themeLabel.textContent = "Theme: Dark";
+        } else {
+          themeLabel.textContent = "Theme: Auto";
+        }
+        logEvent("Theme", "toggle", `Switched to ${theme} color scheme`);
+      });
+
+      // --- 1. Standard Fatimid Picker ---
+      const stdInput = document.getElementById("input-standard");
+      let stdPicker = null;
+
+      function bindInputEvents(input, name) {
+        input.addEventListener("input", () => {
+          logEvent(name, "input", `value="${input.value}"`);
         });
-        btnToggle.textContent = "Destroy Picker";
-        log("Picker initialized successfully.");
+        input.addEventListener("change", () => {
+          logEvent(
+            name,
+            "change",
+            `value="${input.value}", aria-invalid="${input.getAttribute("aria-invalid") || "false"}"`,
+          );
+        });
+        input.addEventListener("taarikh:change", (e) => {
+          logEvent(
+            name,
+            "taarikh:change",
+            `date=${JSON.stringify(e.detail.date)}, value="${e.detail.value}"`,
+          );
+        });
       }
 
-      initPicker();
+      bindInputEvents(stdInput, "Standard Input");
 
-      btnOpen.addEventListener("click", () => {
-        if (picker) {
-          picker.open();
-        }
+      function initStdPicker() {
+        stdPicker = createPicker(stdInput, {
+          onOpen: () => logEvent("Standard Picker", "onOpen", "dialog opened"),
+          onClose: () => logEvent("Standard Picker", "onClose", "dialog closed"),
+          onSelect: (d) => logEvent("Standard Picker", "onSelect", `${d.year}-${d.month}-${d.day}`),
+          onMonthChange: (d) =>
+            logEvent("Standard Picker", "onMonthChange", `month ${d.month}/${d.year}`),
+          onToday: (d) =>
+            logEvent("Standard Picker", "onToday", `set to today (${d.year}-${d.month}-${d.day})`),
+          onClear: () => logEvent("Standard Picker", "onClear", "input cleared"),
+        });
+        document.getElementById("btn-std-toggle").textContent = "Destroy";
+      }
+
+      initStdPicker();
+
+      document.getElementById("btn-std-open").addEventListener("click", () => stdPicker?.open());
+      document.getElementById("btn-std-close").addEventListener("click", () => stdPicker?.close());
+      document.getElementById("btn-std-today").addEventListener("click", () => {
+        const t = today(fatimidAstronomicalCalendar);
+        stdPicker?.setDate(t);
       });
-
-      btnClose.addEventListener("click", () => {
-        if (picker) {
-          picker.close();
-        }
-      });
-
-      btnToggle.addEventListener("click", () => {
-        if (picker) {
-          picker.destroy();
-          picker = null;
-          btnToggle.textContent = "Re-create Picker";
-          log("Picker destroyed (all DOM nodes removed & listeners unbound).");
+      document
+        .getElementById("btn-std-clear")
+        .addEventListener("click", () => stdPicker?.setDate(null));
+      document.getElementById("btn-std-toggle").addEventListener("click", () => {
+        if (stdPicker) {
+          stdPicker.destroy();
+          stdPicker = null;
+          document.getElementById("btn-std-toggle").textContent = "Re-create";
+          logEvent("Standard Picker", "destroy", "picker destroyed cleanly");
         } else {
-          initPicker();
+          initStdPicker();
+          logEvent("Standard Picker", "create", "picker re-created");
         }
+      });
+
+      // --- 2. RTL & Arabic Localisation Picker ---
+      const rtlInput = document.getElementById("input-rtl");
+      const rtlContainer = document.getElementById("container-rtl");
+      const btnToggleDir = document.getElementById("btn-toggle-dir");
+      let currentDir = "rtl";
+
+      bindInputEvents(rtlInput, "RTL Input");
+
+      const ARABIC_LABELS = {
+        chooseDate: "اختر التاريخ",
+        trigger: "اختر التاريخ",
+        previousMonth: "الشهر السابق",
+        prev: "السابق",
+        nextMonth: "الشهر التالي",
+        next: "التالي",
+        monthSelect: "اختر الشهر",
+        yearSelect: "اختر السنة",
+        today: "اليوم",
+        clear: "مسح",
+        close: "إغلاق",
+        dialogTitle: "التقويم الهجري",
+        invalidDate: "الرجاء إدخال تاريخ صحيح",
+        outOfRange: "التاريخ خارج النطاق المحدد",
+        months: {
+          long: [
+            "محرم الحرام",
+            "صفر المظفر",
+            "ربيع الأول",
+            "ربيع الآخر",
+            "جمادى الأولى",
+            "جمادى الآخرة",
+            "رجب الأصب",
+            "شعبان الكريم",
+            "رمضان المعظم",
+            "شوال المكرم",
+            "ذو القعدة الحرام",
+            "ذو الحجة الحرام",
+          ],
+          short: [
+            "محرم",
+            "صفر",
+            "ربيع ١",
+            "ربيع ٢",
+            "جمادى ١",
+            "جمادى ٢",
+            "رجب",
+            "شعبان",
+            "رمضان",
+            "شوال",
+            "ذو القعدة",
+            "ذو الحجة",
+          ],
+        },
+        weekdays: {
+          long: ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"],
+          short: ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"],
+          narrow: ["ح", "ن", "ث", "ر", "خ", "ج", "س"],
+        },
+      };
+
+      let rtlPicker = createPicker(rtlInput, {
+        locale: "ar-EG",
+        dir: "rtl",
+        labels: ARABIC_LABELS,
+        initialDate: { year: 1445, month: 9, day: 1 },
+        onOpen: () => logEvent("Arabic RTL Picker", "onOpen", "dialog opened in RTL"),
+        onClose: () => logEvent("Arabic RTL Picker", "onClose", "dialog closed"),
+        onSelect: (d) => logEvent("Arabic RTL Picker", "onSelect", `${d.year}-${d.month}-${d.day}`),
+      });
+
+      document.getElementById("btn-rtl-open").addEventListener("click", () => rtlPicker?.open());
+      document.getElementById("btn-rtl-close").addEventListener("click", () => rtlPicker?.close());
+      document
+        .getElementById("btn-rtl-clear")
+        .addEventListener("click", () => rtlPicker?.setDate(null));
+
+      btnToggleDir.addEventListener("click", () => {
+        currentDir = currentDir === "rtl" ? "ltr" : "rtl";
+        btnToggleDir.textContent = `dir: ${currentDir}`;
+        rtlContainer.setAttribute("dir", currentDir);
+        rtlInput.setAttribute("dir", currentDir);
+        rtlPicker.destroy();
+        rtlPicker = createPicker(rtlInput, {
+          locale: "ar-EG",
+          dir: currentDir,
+          labels: ARABIC_LABELS,
+          initialDate: { year: 1445, month: 9, day: 1 },
+          onOpen: () => logEvent("Arabic RTL Picker", "onOpen", `opened with dir="${currentDir}"`),
+          onClose: () => logEvent("Arabic RTL Picker", "onClose", "dialog closed"),
+          onSelect: (d) =>
+            logEvent("Arabic RTL Picker", "onSelect", `${d.year}-${d.month}-${d.day}`),
+        });
+        logEvent("Arabic RTL Picker", "dirToggle", `Switched direction to ${currentDir}`);
+      });
+
+      // --- 3. Bounded Picker (Min / Max Constraints) ---
+      const boundedInput = document.getElementById("input-bounded");
+      bindInputEvents(boundedInput, "Bounded Input");
+
+      const boundedPicker = createPicker(boundedInput, {
+        minDate: { year: 1445, month: 9, day: 1 }, // 1 Ramadan 1445
+        maxDate: { year: 1445, month: 12, day: 30 }, // 30 Zilhajj 1445
+        initialDate: { year: 1445, month: 9, day: 15 },
+        onOpen: () => logEvent("Bounded Picker", "onOpen", "dialog opened"),
+        onClose: () => logEvent("Bounded Picker", "onClose", "dialog closed"),
+        onSelect: (d) => logEvent("Bounded Picker", "onSelect", `${d.year}-${d.month}-${d.day}`),
+      });
+
+      document.getElementById("btn-bounded-min").addEventListener("click", () => {
+        boundedPicker.setDate({ year: 1445, month: 9, day: 1 });
+      });
+
+      document.getElementById("btn-bounded-max").addEventListener("click", () => {
+        boundedPicker.setDate({ year: 1445, month: 12, day: 30 });
+      });
+
+      document.getElementById("btn-bounded-invalid").addEventListener("click", () => {
+        // Typing an out-of-range date
+        boundedInput.value = "1445-01-01";
+        boundedInput.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+
+      document.getElementById("btn-bounded-clear").addEventListener("click", () => {
+        boundedPicker.setDate(null);
       });
     </script>
   </body>
