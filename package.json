@@ -22,6 +22,7 @@
     "check": "vp check",
     "check:fallow": "fallow audit",
     "fallow": "fallow",
+    "pretest": "npm run build:core",
     "test": "vp test",
     "test:unit": "npm run test -w @taarikh/core",
     "test:browser": "npm run test -w @taarikh/picker",

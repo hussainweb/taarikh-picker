@@ -1,7 +1,16 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vite-plus";
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 export default defineConfig({
+  resolve: {
+    alias: {
+      "@taarikh/core": path.resolve(__dirname, "packages/core/src/index.ts"),
+    },
+  },
   test: {
     projects: [
       {
