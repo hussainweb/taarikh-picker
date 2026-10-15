@@ -1,6 +1,6 @@
 {
   "name": "@taarikh/picker",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "description": "Lightweight, accessible Hijri calendar date picker",
   "homepage": "https://github.com/hussainweb/taarikh-picker#readme",
   "license": "MIT",
@@ -37,6 +37,6 @@
     "test": "vp test"
   },
   "dependencies": {
-    "@taarikh/core": "^0.1.0"
+    "@taarikh/core": "^0.2.1"
   }
 }
