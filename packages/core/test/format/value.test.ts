@@ -148,6 +148,14 @@ describe("parseValue", () => {
     expect(parseValue("1 FakeMonth 1445", "D MMMM YYYY")).toBeNull();
   });
 
+  it("normalizes lowercase pattern tokens (yyyy-mm-dd, dd/mm/yyyy)", () => {
+    const date = { year: 1445, month: 9, day: 1 };
+    expect(formatValue(date, "yyyy-mm-dd")).toBe("1445-09-01");
+    expect(formatValue(date, "dd/mm/yyyy")).toBe("01/09/1445");
+    expect(parseValue("1445-09-01", "yyyy-mm-dd", fatimidAstronomicalCalendar)).toEqual(date);
+    expect(parseValue("01/09/1445", "dd/mm/yyyy", fatimidAstronomicalCalendar)).toEqual(date);
+  });
+
   it("round-trips formatValue and parseValue for valid dates", () => {
     const dates = [
       { year: 1445, month: 9, day: 1 },

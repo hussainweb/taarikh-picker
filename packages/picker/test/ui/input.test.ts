@@ -39,6 +39,31 @@ describe("Input binding, typed validation, and events (tp-il8.3.3)", () => {
       expect(elements.liveRegion.textContent).toBe("Ramadan al-Moazzam 1445");
     });
 
+    it("parses valid initial input value with lowercase valuePattern and populates on select", () => {
+      input.value = "1445-09-15";
+      const shell = new DialogShell(input, { valuePattern: "yyyy-mm-dd" });
+
+      expect(shell.getSelectedDate()).toEqual({ year: 1445, month: 9, day: 15 });
+      expect(shell.getVisibleDate()).toEqual({ year: 1445, month: 9, day: 15 });
+
+      shell.selectDate({ year: 1445, month: 9, day: 20 });
+      expect(input.value).toBe("1445-09-20");
+    });
+
+    it("synchronizes visibleDate and selectedDate on open() when input value is changed", () => {
+      input.value = "1445-09-01";
+      const shell = new DialogShell(input);
+      expect(shell.getSelectedDate()).toEqual({ year: 1445, month: 9, day: 1 });
+
+      // Change input value externally
+      input.value = "1446-01-10";
+      shell.open();
+
+      expect(shell.getSelectedDate()).toEqual({ year: 1446, month: 1, day: 10 });
+      expect(shell.getVisibleDate()).toEqual({ year: 1446, month: 1, day: 10 });
+      shell.close();
+    });
+
     it("defaults to today or initialDate when input.value is empty", () => {
       input.value = "";
       const customInitial: PlainDate = { year: 1448, month: 4, day: 1 };

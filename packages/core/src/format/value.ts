@@ -1,6 +1,16 @@
 import type { CalendarEngine, PlainDate } from "../engine/types.js";
 import { DEFAULT_MONTH_LABELS, type MonthLabels, getMonthName } from "../engine/labels.js";
 
+function normalizePattern(pattern: string): string {
+  return pattern
+    .replace(/mmmm/g, "MMMM")
+    .replace(/mmm/g, "MMM")
+    .replace(/yyyy/g, "YYYY")
+    .replace(/yy/g, "YY")
+    .replace(/mm/g, "MM")
+    .replace(/dd/g, "DD");
+}
+
 /**
  * Format a PlainDate into a machine-readable value string.
  *
@@ -21,6 +31,7 @@ export function formatValue(
   pattern: string = "YYYY-MM-DD",
   labels: MonthLabels = DEFAULT_MONTH_LABELS,
 ): string {
+  const normalizedPattern = normalizePattern(pattern);
   const yearStr =
     date.year < 0
       ? `-${String(Math.abs(date.year)).padStart(4, "0")}`
@@ -31,7 +42,7 @@ export function formatValue(
   const dayStr2 = String(date.day).padStart(2, "0");
   const dayStr1 = String(date.day);
 
-  return pattern.replace(/MMMM|MMM|YYYY|MM|M|DD|D/g, (token) => {
+  return normalizedPattern.replace(/MMMM|MMM|YYYY|MM|M|DD|D/g, (token) => {
     switch (token) {
       case "YYYY":
         return yearStr;
@@ -87,15 +98,16 @@ export function parseValue(
     return null;
   }
 
+  const normalizedPattern = normalizePattern(pattern);
   const tokenRegex = /MMMM|MMM|YYYY|MM|M|DD|D/g;
   const tokens: TokenDef[] = [];
   let lastIndex = 0;
   let match: RegExpExecArray | null;
 
-  while ((match = tokenRegex.exec(pattern)) !== null) {
+  while ((match = tokenRegex.exec(normalizedPattern)) !== null) {
     if (match.index > lastIndex) {
       tokens.push({
-        literal: pattern.slice(lastIndex, match.index),
+        literal: normalizedPattern.slice(lastIndex, match.index),
       });
     }
     const token = match[0];

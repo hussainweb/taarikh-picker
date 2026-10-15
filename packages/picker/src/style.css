@@ -81,7 +81,7 @@
     font-size: var(--tp-font-size);
     inline-size: var(--tp-dialog-width);
     max-inline-size: min(92vw, 360px);
-    overflow: visible;
+    overflow: hidden;
 
     /* CSS Anchor Positioning standard properties */
     position-area: block-end span-inline-start;
@@ -269,24 +269,55 @@
     margin-block-end: 10px;
   }
 
-  :where(.tp-grid-table) {
+  .tp-grid-table {
     inline-size: 100%;
+    width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
+    margin: 0;
+    margin-block: 0;
+    padding: 0;
+    border: none;
   }
 
-  :where(.tp-grid-head-cell) {
+  .tp-grid-table tr {
+    border: none;
+    border-block-end: none;
+    background: transparent;
+    margin: 0;
+    padding: 0;
+  }
+
+  .tp-grid-table tr:hover {
+    background: transparent;
+  }
+
+  .tp-grid-head-cell {
     box-sizing: border-box;
+    height: auto;
+    min-height: 0;
     padding: 4px 0 6px 0;
+    margin: 0;
     font-size: 0.75rem;
     font-weight: 600;
     color: var(--tp-text-muted);
     text-align: center;
+    white-space: nowrap;
+    background: transparent;
+    border: none;
+    border-block-end: none;
+    line-height: 1;
   }
 
-  :where(.tp-grid-cell) {
+  .tp-grid-cell {
     box-sizing: border-box;
+    height: auto;
+    min-height: 0;
     padding: 2px;
+    margin: 0;
+    background: transparent;
+    border: none;
+    border-block-end: none;
     text-align: center;
   }
 
@@ -294,6 +325,7 @@
     padding: 0;
   }
 
+  .tp-day-btn,
   :where(.tp-day-btn) {
     box-sizing: border-box;
     display: inline-flex;
@@ -313,6 +345,8 @@
     font-family: var(--tp-font-family);
     font-size: 0.875rem;
     line-height: 1;
+    appearance: none;
+    -webkit-appearance: none;
     transition:
       background-color 120ms ease,
       border-color 120ms ease,

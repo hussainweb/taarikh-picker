@@ -293,10 +293,33 @@ export class DialogShell {
     if (this.destroyed || this.isOpen()) {
       return;
     }
+    this.syncFromInputValue();
     this.elements.dialog.showModal();
     this.elements.trigger.setAttribute("aria-expanded", "true");
     this.grid.focusActiveDay();
     this.options.onOpen?.();
+  }
+
+  private syncFromInputValue(): void {
+    const raw = this.input.value.trim();
+    if (!raw) {
+      return;
+    }
+    const parsed = parseValue(raw, this.valuePattern, this.engine, this.labels.months);
+    if (!parsed) {
+      return;
+    }
+    if (this.options.minDate && isBefore(parsed, this.options.minDate)) {
+      return;
+    }
+    if (this.options.maxDate && isAfter(parsed, this.options.maxDate)) {
+      return;
+    }
+    this.selectedDate = parsed;
+    this.visibleDate = parsed;
+    this.grid.setSelectedDate(parsed);
+    this.grid.setVisibleDate(parsed, parsed.day);
+    this.updateVisibleDisplay();
   }
 
   public close(): void {
