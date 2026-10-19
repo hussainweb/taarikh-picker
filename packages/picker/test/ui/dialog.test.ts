@@ -574,9 +574,10 @@ describe("TaarikhPicker & createPicker API", () => {
     picker.open();
     const el = picker.getElements()!;
     const cs = iframe.contentWindow!.getComputedStyle(el.dialog);
-    if (cs.positionArea) {
-      expect(cs.positionArea).toContain("span-end");
-      expect(cs.positionArea).not.toContain("span-start");
+    const positionArea = cs.getPropertyValue("position-area");
+    if (positionArea) {
+      expect(positionArea).toContain("span-end");
+      expect(positionArea).not.toContain("span-start");
     }
     picker.destroy();
     iframe.remove();
@@ -611,7 +612,8 @@ describe("TaarikhPicker & createPicker API", () => {
     const el = picker.getElements()!;
     const cs = iframe.contentWindow!.getComputedStyle(el.dialog);
     expect(cs.position).toBe("fixed");
-    expect(cs.positionArea || "none").toBe("none");
+    const mobilePositionArea = cs.getPropertyValue("position-area");
+    expect(mobilePositionArea || "none").toBe("none");
 
     const dialogRect = el.dialog.getBoundingClientRect();
     expect(dialogRect.width).toBeCloseTo(390, -1);
