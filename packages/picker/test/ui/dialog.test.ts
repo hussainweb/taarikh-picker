@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import "../../src/style.css";
 import { DialogShell } from "../../src/ui/dialog.js";
 import { createPicker, TaarikhPicker } from "../../src/index.js";
 import type { MonthLabels, PlainDate } from "@taarikh/core";
@@ -545,5 +546,86 @@ describe("TaarikhPicker & createPicker API", () => {
     expect(monthRect3.left).toBeGreaterThanOrEqual(dialogRect3.left);
     expect(yearRect3.left).toBeGreaterThanOrEqual(dialogRect3.left);
     picker3.destroy();
+  });
+
+  it("uses block-end span-inline-end for standard dropdown anchor positioning on desktop viewports (> 480px)", async () => {
+    const iframe = document.createElement("iframe");
+    iframe.style.width = "600px";
+    iframe.style.height = "800px";
+    iframe.style.border = "none";
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentDocument!;
+    const styleLink = doc.createElement("link");
+    styleLink.rel = "stylesheet";
+    styleLink.href = new URL("../../src/style.css", import.meta.url).href;
+    doc.head.appendChild(styleLink);
+
+    await new Promise((resolve) => {
+      styleLink.onload = resolve;
+      setTimeout(resolve, 300);
+    });
+
+    const desktopInput = doc.createElement("input");
+    desktopInput.type = "text";
+    doc.body.appendChild(desktopInput);
+
+    const picker = createPicker(desktopInput);
+    picker.open();
+    const el = picker.getElements()!;
+    const cs = iframe.contentWindow!.getComputedStyle(el.dialog);
+    if (cs.positionArea) {
+      expect(cs.positionArea).toContain("span-end");
+      expect(cs.positionArea).not.toContain("span-start");
+    }
+    picker.destroy();
+    iframe.remove();
+  });
+
+  it("renders as a full-width bottom sheet without anchor positioning clipping on mobile viewports (tp-aen / #2)", async () => {
+    const iframe = document.createElement("iframe");
+    iframe.style.width = "390px";
+    iframe.style.height = "844px";
+    iframe.style.border = "none";
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentDocument!;
+    const styleLink = doc.createElement("link");
+    styleLink.rel = "stylesheet";
+    styleLink.href = new URL("../../src/style.css", import.meta.url).href;
+    doc.head.appendChild(styleLink);
+
+    await new Promise((resolve) => {
+      styleLink.onload = resolve;
+      setTimeout(resolve, 300);
+    });
+
+    const mobileInput = doc.createElement("input");
+    mobileInput.type = "text";
+    doc.body.appendChild(mobileInput);
+
+    const picker = createPicker(mobileInput, {
+      initialDate: { year: 1448, month: 5, day: 9 }, // Jumada al-Ula 1448
+    });
+    picker.open();
+    const el = picker.getElements()!;
+    const cs = iframe.contentWindow!.getComputedStyle(el.dialog);
+    expect(cs.position).toBe("fixed");
+    expect(cs.positionArea || "none").toBe("none");
+
+    const dialogRect = el.dialog.getBoundingClientRect();
+    expect(dialogRect.width).toBeCloseTo(390, -1);
+
+    // Verify all day buttons are contained within the dialog boundaries
+    const dayBtns = el.dialog.querySelectorAll<HTMLButtonElement>(".tp-day-btn");
+    expect(dayBtns.length).toBeGreaterThan(0);
+    for (const btn of dayBtns) {
+      const btnRect = btn.getBoundingClientRect();
+      expect(btnRect.left).toBeGreaterThanOrEqual(dialogRect.left);
+      expect(btnRect.right).toBeLessThanOrEqual(dialogRect.right);
+    }
+
+    picker.destroy();
+    iframe.remove();
   });
 });

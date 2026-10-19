@@ -84,7 +84,7 @@
     overflow: hidden;
 
     /* CSS Anchor Positioning standard properties */
-    position-area: block-end span-inline-start;
+    position-area: block-end span-inline-end;
     position-try-fallbacks: flip-block, flip-inline;
 
     /* Discrete entrance transition */
@@ -110,7 +110,7 @@
   }
 
   /* Reset margin when anchor positioning is active */
-  @supports (position-anchor: --test) or (position-area: block-end span-inline-start) {
+  @supports (position-anchor: --test) or (position-area: block-end span-inline-end) {
     :where(.tp-dialog) {
       margin: 0;
       margin-block-start: var(--tp-anchor-offset);
@@ -118,7 +118,7 @@
   }
 
   /* Centered dialog fallback when anchor positioning is not supported */
-  @supports not ((position-anchor: --test) or (position-area: block-end span-inline-start)) {
+  @supports not ((position-anchor: --test) or (position-area: block-end span-inline-end)) {
     :where(.tp-dialog) {
       margin: auto;
     }
@@ -144,7 +144,7 @@
     }
   }
 
-  @supports (position-anchor: --test) or (position-area: block-end span-inline-start) {
+  @supports (position-anchor: --test) or (position-area: block-end span-inline-end) {
     :where(.tp-dialog::backdrop) {
       background: transparent;
     }
@@ -433,6 +433,9 @@
   @media (max-width: 480px) {
     :where(.tp-dialog) {
       position: fixed;
+      position-anchor: none;
+      position-area: none;
+      position-try-fallbacks: none;
       inset-block-start: auto;
       inset-block-end: 0;
       inset-inline-start: 0;
@@ -441,6 +444,7 @@
       max-inline-size: 100%;
       max-block-size: 90dvh;
       margin: 0;
+      margin-block-start: 0;
       border-radius: var(--tp-radius) var(--tp-radius) 0 0;
       border-block-end: none;
       border-inline: none;
