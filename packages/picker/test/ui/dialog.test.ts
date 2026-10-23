@@ -630,4 +630,141 @@ describe("TaarikhPicker & createPicker API", () => {
     picker.destroy();
     iframe.remove();
   });
+
+  it("isolates picker layout against unlayered host theme resets while allowing intentional token and class overrides (tp-0ic / #4)", async () => {
+    const iframe = document.createElement("iframe");
+    iframe.style.width = "800px";
+    iframe.style.height = "800px";
+    iframe.style.border = "none";
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentDocument!;
+    const win = iframe.contentWindow!;
+
+    const styleLink = doc.createElement("link");
+    styleLink.rel = "stylesheet";
+    styleLink.href = new URL("../../src/style.css", import.meta.url).href;
+    doc.head.appendChild(styleLink);
+
+    await new Promise((resolve) => {
+      styleLink.onload = resolve;
+      setTimeout(resolve, 300);
+    });
+
+    // Inject unlayered host theme resets AFTER picker stylesheet, plus intentional overrides
+    const hostStyle = doc.createElement("style");
+    hostStyle.textContent = `
+      table {
+        width: 100%;
+        margin: 24px 0;
+        border: 3px solid rgb(220, 38, 38);
+      }
+      table thead th,
+      table tbody td {
+        padding: 18px 24px;
+        border: 2px solid rgb(220, 38, 38);
+        background: rgb(254, 226, 226);
+        text-transform: uppercase;
+      }
+      button,
+      .form-item button {
+        padding: 16px 32px;
+        margin: 12px;
+        background: rgb(220, 38, 38);
+        color: rgb(255, 255, 255);
+        text-transform: uppercase;
+      }
+      select,
+      .form-item select {
+        width: 100%;
+        min-height: 52px;
+        padding: 14px 20px;
+        margin: 14px;
+      }
+      header,
+      footer {
+        padding: 24px;
+        margin: 20px;
+        background: rgb(254, 226, 226);
+      }
+
+      /* Intentional Override 1: CSS custom properties */
+      .custom-tokens {
+        --tp-accent: rgb(13, 148, 136);
+        --tp-selected-text: rgb(240, 253, 250);
+        --tp-radius: 16px;
+      }
+
+      /* Intentional Override 2: Direct .tp-dialog .tp-* selector */
+      .tp-dialog.custom-class .tp-day-btn {
+        border-radius: 9999px;
+      }
+    `;
+    doc.head.appendChild(hostStyle);
+
+    // 1. Default picker inside .form-item
+    const formItem1 = doc.createElement("div");
+    formItem1.className = "form-item";
+    const input1 = doc.createElement("input");
+    input1.type = "text";
+    input1.value = "1448-05-09";
+    formItem1.appendChild(input1);
+    doc.body.appendChild(formItem1);
+
+    const picker1 = createPicker(input1);
+    picker1.open();
+    const el1 = picker1.getElements()!;
+
+    // Verify accidental host resets do NOT leak into trigger or dialog controls
+    expect(win.getComputedStyle(el1.trigger).padding).toBe("4px 8px");
+    expect(win.getComputedStyle(el1.trigger).backgroundColor).not.toBe("rgb(220, 38, 38)");
+    expect(win.getComputedStyle(el1.btnPrev).padding).toBe("4px 8px");
+    expect(win.getComputedStyle(el1.btnPrev).textTransform).toBe("none");
+    expect(win.getComputedStyle(el1.selectMonth).padding).toBe("4px 6px");
+    expect(win.getComputedStyle(el1.selectMonth).margin).toBe("0px");
+    expect(win.getComputedStyle(el1.grid).margin).toBe("0px");
+
+    const th1 = el1.grid.querySelector<HTMLElement>(".tp-grid-head-cell")!;
+    const td1 = el1.grid.querySelector<HTMLElement>(".tp-grid-cell:not(.tp-grid-cell-empty)")!;
+    const unselectedBtn1 = el1.grid.querySelector<HTMLElement>(
+      '.tp-day-btn:not([data-selected="true"])',
+    )!;
+    const selectedBtn1 = el1.grid.querySelector<HTMLElement>('.tp-day-btn[data-selected="true"]')!;
+
+    expect(win.getComputedStyle(th1).padding).toBe("4px 0px 6px");
+    expect(win.getComputedStyle(th1).textTransform).toBe("none");
+    expect(win.getComputedStyle(td1).padding).toBe("2px");
+    expect(win.getComputedStyle(unselectedBtn1).padding).toBe("0px");
+    expect(win.getComputedStyle(unselectedBtn1).backgroundColor).toBe("rgba(0, 0, 0, 0)");
+    expect(win.getComputedStyle(selectedBtn1).backgroundColor).toBe("rgb(26, 115, 232)");
+    expect(win.getComputedStyle(selectedBtn1).color).toBe("rgb(255, 255, 255)");
+
+    const dialogRect1 = el1.dialog.getBoundingClientRect();
+    const nextRect1 = el1.btnNext.getBoundingClientRect();
+    expect(nextRect1.right).toBeLessThanOrEqual(dialogRect1.right);
+    picker1.destroy();
+
+    // 2. Intentional override via --tp-* custom properties and .tp-dialog .tp-* selector
+    const formItem2 = doc.createElement("div");
+    formItem2.className = "form-item custom-tokens";
+    const input2 = doc.createElement("input");
+    input2.type = "text";
+    input2.value = "1448-05-09";
+    formItem2.appendChild(input2);
+    doc.body.appendChild(formItem2);
+
+    const picker2 = createPicker(input2);
+    const el2 = picker2.getElements()!;
+    el2.dialog.classList.add("custom-class");
+    picker2.open();
+
+    const selectedBtn2 = el2.grid.querySelector<HTMLElement>('.tp-day-btn[data-selected="true"]')!;
+    expect(win.getComputedStyle(el2.dialog).borderRadius).toBe("16px");
+    expect(win.getComputedStyle(selectedBtn2).backgroundColor).toBe("rgb(13, 148, 136)");
+    expect(win.getComputedStyle(selectedBtn2).color).toBe("rgb(240, 253, 250)");
+    expect(win.getComputedStyle(selectedBtn2).borderRadius).toBe("9999px");
+
+    picker2.destroy();
+    iframe.remove();
+  });
 });
