@@ -17,7 +17,7 @@ A lightweight, accessible Hijri calendar date picker with zero third-party depen
 - **Bidirectional & RTL Layout**: Automatic or manual direction detection (`ltr`, `rtl`, `auto`). Mirrors layout via CSS logical properties, mirrors navigation glyphs (`‹`/`›`), and mirrors keyboard arrow keys.
 - **Comprehensive Localization**: Month names, weekday headers, button labels, and live-region announcements are fully customizable via options or auto-derived from `Intl`.
 - **Strict Separation of Value and Display**: Submitted form inputs always receive standard, zero-padded ASCII `YYYY-MM-DD` strings (e.g. `1446-09-01`), while UI headers, dropdowns, and announcements use localized numerals and script separators.
-- **Modern CSS Architecture**: Wrapped in `@layer taarikh-picker` with CSS Anchor Positioning (centered modal fallback), light/dark mode support via `light-dark()`, high-contrast (`forced-colors`), mobile bottom-sheet styling, and customizable `--tp-*` design tokens.
+- **Modern CSS Architecture**: Isolated component selectors (`.tp-dialog .tp-*`) that resist accidental host theme resets, paired with zero-specificity `--tp-*` design tokens, CSS Anchor Positioning (centered modal fallback), light/dark mode via `light-dark()`, high-contrast (`forced-colors`), and mobile bottom-sheet styling.
 - **Dual Distribution**: Available as `@taarikh/picker` on npm and `hussainweb/taarikh-picker` on Packagist for seamless integration into Drupal and modern web stacks.
 
 ---
@@ -271,16 +271,24 @@ input.addEventListener("taarikh:change", (event: CustomEvent) => {
 
 ## Styling & Design Tokens
 
-Styles are packaged in `@layer taarikh-picker` so that host application styles naturally take precedence without requiring high specificity or `!important`.
+The stylesheet is designed so that generic host theme rules (such as `table`, `th`, `td`, `.form-item button`, or `.form-item select` in CMS themes like Drupal Claro/Gin) cannot accidentally break the picker's layout, while intentional customization remains straightforward:
+
+1. **CSS Custom Properties (`(0, 0, 0)` specificity)**: Declared on `:where(:root, :host)`, so setting `--tp-*` tokens on `:root`, a form wrapper, or `.tp-dialog` always takes precedence regardless of stylesheet load order.
+2. **Flat Component Selectors (`(0, 2, 0)` specificity)**: Internal elements use uniform `.tp-dialog .tp-<element>` selectors (and `.tp-btn-trigger.tp-btn-trigger` for the trigger button). To override a rule directly, target `.tp-dialog .tp-<element>` in a stylesheet loaded after `@taarikh/picker/style.css`, or scope with a wrapper class (e.g., `.my-form .tp-dialog .tp-day-btn`).
+3. **Optional Cascade Layering**: If your application manages styles via CSS Cascade Layers, import the stylesheet into your desired layer:
+   ```css
+   @import "@taarikh/picker/style.css" layer(components);
+   ```
 
 ### CSS Custom Properties (`--tp-*`)
 
-Override any of the design tokens on `:root`, a form container, or the input:
+Override any of the design tokens on `:root`, a form container, or `.tp-dialog`:
 
 ```css
 :root {
   /* Colors */
   --tp-accent: #1a73e8; /* Primary action color */
+  --tp-selected-text: #ffffff; /* Selected day text color */
   --tp-bg: light-dark(#ffffff, #1e1e1e); /* Dialog background */
   --tp-text: light-dark(#202124, #e8eaed); /* Main text color */
   --tp-text-muted: light-dark(#5f6368, #9aa0a6); /* Weekday headers & secondary text */
