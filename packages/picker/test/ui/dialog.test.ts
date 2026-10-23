@@ -722,14 +722,15 @@ describe("TaarikhPicker & createPicker API", () => {
     expect(win.getComputedStyle(el1.btnPrev).textTransform).toBe("none");
     expect(win.getComputedStyle(el1.selectMonth).padding).toBe("4px 6px");
     expect(win.getComputedStyle(el1.selectMonth).margin).toBe("0px");
-    expect(win.getComputedStyle(el1.grid).margin).toBe("0px");
+    const grid1 = el1.grid!;
+    expect(win.getComputedStyle(grid1).margin).toBe("0px");
 
-    const th1 = el1.grid.querySelector<HTMLElement>(".tp-grid-head-cell")!;
-    const td1 = el1.grid.querySelector<HTMLElement>(".tp-grid-cell:not(.tp-grid-cell-empty)")!;
-    const unselectedBtn1 = el1.grid.querySelector<HTMLElement>(
+    const th1 = grid1.querySelector<HTMLElement>(".tp-grid-head-cell")!;
+    const td1 = grid1.querySelector<HTMLElement>(".tp-grid-cell:not(.tp-grid-cell-empty)")!;
+    const unselectedBtn1 = grid1.querySelector<HTMLElement>(
       '.tp-day-btn:not([data-selected="true"])',
     )!;
-    const selectedBtn1 = el1.grid.querySelector<HTMLElement>('.tp-day-btn[data-selected="true"]')!;
+    const selectedBtn1 = grid1.querySelector<HTMLElement>('.tp-day-btn[data-selected="true"]')!;
 
     expect(win.getComputedStyle(th1).padding).toBe("4px 0px 6px");
     expect(win.getComputedStyle(th1).textTransform).toBe("none");
@@ -758,7 +759,7 @@ describe("TaarikhPicker & createPicker API", () => {
     el2.dialog.classList.add("custom-class");
     picker2.open();
 
-    const selectedBtn2 = el2.grid.querySelector<HTMLElement>('.tp-day-btn[data-selected="true"]')!;
+    const selectedBtn2 = el2.grid!.querySelector<HTMLElement>('.tp-day-btn[data-selected="true"]')!;
     expect(win.getComputedStyle(el2.dialog).borderRadius).toBe("16px");
     expect(win.getComputedStyle(selectedBtn2).backgroundColor).toBe("rgb(13, 148, 136)");
     expect(win.getComputedStyle(selectedBtn2).color).toBe("rgb(240, 253, 250)");

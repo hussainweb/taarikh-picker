@@ -29,7 +29,7 @@
     "verify:core": "npx publint packages/core && npx attw --pack packages/core",
     "verify:picker": "npx publint packages/picker && npx attw --pack packages/picker",
     "verify": "npm run verify:core && npm run verify:picker && npx size-limit",
-    "ci": "npm run check && npm run check:fallow && npm run test && npm run build && npm run verify"
+    "ci": "npm run check && npm run check:fallow && npm run typecheck && npm run test && npm run build && npm run verify"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
