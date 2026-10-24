@@ -556,15 +556,9 @@ describe("TaarikhPicker & createPicker API", () => {
     document.body.appendChild(iframe);
 
     const doc = iframe.contentDocument!;
-    const styleLink = doc.createElement("link");
-    styleLink.rel = "stylesheet";
-    styleLink.href = new URL("../../src/style.css", import.meta.url).href;
-    doc.head.appendChild(styleLink);
-
-    await new Promise((resolve) => {
-      styleLink.onload = resolve;
-      setTimeout(resolve, 300);
-    });
+    for (const style of document.head.querySelectorAll("style, link[rel='stylesheet']")) {
+      doc.head.appendChild(style.cloneNode(true));
+    }
 
     const desktopInput = doc.createElement("input");
     desktopInput.type = "text";
@@ -591,15 +585,9 @@ describe("TaarikhPicker & createPicker API", () => {
     document.body.appendChild(iframe);
 
     const doc = iframe.contentDocument!;
-    const styleLink = doc.createElement("link");
-    styleLink.rel = "stylesheet";
-    styleLink.href = new URL("../../src/style.css", import.meta.url).href;
-    doc.head.appendChild(styleLink);
-
-    await new Promise((resolve) => {
-      styleLink.onload = resolve;
-      setTimeout(resolve, 300);
-    });
+    for (const style of document.head.querySelectorAll("style, link[rel='stylesheet']")) {
+      doc.head.appendChild(style.cloneNode(true));
+    }
 
     const mobileInput = doc.createElement("input");
     mobileInput.type = "text";
@@ -641,15 +629,9 @@ describe("TaarikhPicker & createPicker API", () => {
     const doc = iframe.contentDocument!;
     const win = iframe.contentWindow!;
 
-    const styleLink = doc.createElement("link");
-    styleLink.rel = "stylesheet";
-    styleLink.href = new URL("../../src/style.css", import.meta.url).href;
-    doc.head.appendChild(styleLink);
-
-    await new Promise((resolve) => {
-      styleLink.onload = resolve;
-      setTimeout(resolve, 300);
-    });
+    for (const style of document.head.querySelectorAll("style, link[rel='stylesheet']")) {
+      doc.head.appendChild(style.cloneNode(true));
+    }
 
     // Inject unlayered host theme resets AFTER picker stylesheet, plus intentional overrides
     const hostStyle = doc.createElement("style");

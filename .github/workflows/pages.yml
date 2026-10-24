@@ -39,11 +39,14 @@ jobs:
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: Quality gates
-        run: |
-          npm run check
-          npm test
-          npm run typecheck
+      - name: Check code formatting and linting
+        run: npm run check
+
+      - name: Run test suite
+        run: npm test
+
+      - name: Run type check
+        run: npm run typecheck
 
       - name: Build distribution library
         run: npm run build
